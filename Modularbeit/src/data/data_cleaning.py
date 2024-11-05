@@ -4,7 +4,7 @@ from typing import List
 from utils import *
 
 
-def clean_dataframe(df: DataFrame):
+def clean_data(df: DataFrame):
     logging.info(50*"=")
     logging.info("Start data cleaning")
     log_df_shape(df)
@@ -38,5 +38,7 @@ def clean_dataframe(df: DataFrame):
     clean_high_prices(cleaned_df)
 
     log_df_shape(cleaned_df)
+
+    df.to_csv('Modularbeit/data/cleaned_data/re_cleaned.csv')
 
     return cleaned_df

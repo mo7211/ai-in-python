@@ -5,7 +5,7 @@ import time
 
 from visualization import visualize
 from utils import configurize_logger, log_versions
-from data import clean_dataframe
+from data import clean_data, prep_data
 
 
 def main():
@@ -20,10 +20,14 @@ def main():
     visualize(df)
 
     logging.info('Clean data')
-    cleaned_df = clean_dataframe(df)
+    cleaned_df = clean_data(df)
 
     logging.info('Creating visualization after cleaning')
     visualize(cleaned_df)
+
+    preprocessed_df = prep_data(cleaned_df)
+
+    visualize(preprocessed_df)
 
 
 main()
