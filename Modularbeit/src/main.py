@@ -3,20 +3,21 @@ import pandas as pd
 
 from visualization import visualize
 from utils import configurize_logger, log_versions
+from data import clean_data
 
 log_versions()
 
 script = 'Starting script'
 
-with script:
-    configurize_logger(script)
+configurize_logger(script)
 
-    logging.info('Importing raw data')
-    df = pd.read_csv('Modularbeit/data/raw_data/Real Estate Dataset.csv', sep=';')
+logging.info('Importing raw data')
+df = pd.read_csv('Modularbeit/data/raw_data/Real Estate Dataset.csv', sep=';')
 
-    logging.info('Creating visualization before cleaning')
-    visualize(df)
+logging.info('Creating visualization before cleaning')
+# visualize(df)
 
-    logging.info('Cleaning raw data')
+clean_data(df)
 
-    logging.info('Creating visualization after cleaning')
+logging.info('Creating visualization after cleaning')
+# visualize(df)
