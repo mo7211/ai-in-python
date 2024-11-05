@@ -1,23 +1,29 @@
-import logging 
+import logging
 import pandas as pd
+import os.path as osp
+import time
 
 from visualization import visualize
 from utils import configurize_logger, log_versions
-from data import clean_data
+from data import clean_dataframe
 
-log_versions()
 
-script = 'Starting script'
+def main():
+    # log_versions()
 
-configurize_logger(script)
+    df = pd.read_csv(
+        'Modularbeit/data/raw_data/Real Estate Dataset.csv', sep=';')
 
-logging.info('Importing raw data')
-df = pd.read_csv('Modularbeit/data/raw_data/Real Estate Dataset.csv', sep=';')
+    configurize_logger(__name__)
 
-logging.info('Creating visualization before cleaning')
-# visualize(df)
+    logging.info('Creating visualization before cleaning')
+    visualize(df)
 
-clean_data(df)
+    logging.info('Clean data')
+    cleaned_df = clean_dataframe(df)
 
-logging.info('Creating visualization after cleaning')
-# visualize(df)
+    logging.info('Creating visualization after cleaning')
+    visualize(cleaned_df)
+
+
+main()

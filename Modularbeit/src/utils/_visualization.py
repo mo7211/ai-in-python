@@ -36,7 +36,7 @@ def create_barplot_null_values(null_percentages, title, y_label, x_label):
 
 def create_barplot_year(df: DataFrame, column: str, title: str, y_label: str, x_label: str) -> None:
     df_yb = df
-    df_yb[column] = df_yb[column].replace(np.nan, -1)
+    df_yb[column] = df_yb[column].replace(np.nan, -1, inplace=False)
     df_yb_grouped = df_yb.groupby(column)[column].count()
 
     plt.bar(list(df_yb_grouped.index[:-1]),
