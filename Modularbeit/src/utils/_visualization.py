@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from pandas import DataFrame
 
 
 def create_scatterplot(df, column_name, title, y_label, x_label, x_ticks):
@@ -11,7 +12,6 @@ def create_scatterplot(df, column_name, title, y_label, x_label, x_ticks):
     plt.xticks(x_ticks)
     plt.show()
 
-
 def create_barplot_null_values(null_percentages, title, y_label, x_label):
     plt.bar(list(null_percentages.index), list(
         null_percentages.values), color='blue')
@@ -22,7 +22,19 @@ def create_barplot_null_values(null_percentages, title, y_label, x_label):
     plt.show()
 
 
-def create_barplot_year(df, column, title, y_label, x_label):
+def create_barplot_null_values(null_percentages, title, y_label, x_label):
+    
+    
+    plt.bar(list(null_percentages.index), list(
+        null_percentages.values), color='blue')
+    plt.title(title)
+    plt.ylabel(y_label)
+    plt.xlabel(x_label)
+    plt.xticks(rotation=45, ha='right')
+    plt.show()
+
+
+def create_barplot_year(df: DataFrame, column: str, title: str, y_label: str, x_label: str) -> None:
     df_yb = df
     df_yb[column] = df_yb[column].replace(np.nan, -1)
     df_yb_grouped = df_yb.groupby(column)[column].count()
@@ -35,7 +47,7 @@ def create_barplot_year(df, column, title, y_label, x_label):
     plt.yscale('log')
     plt.show()
 
-def create_scatterplot_price(df, column, title, x_label, y_label):
+def create_scatterplot_price(df:DataFrame, column:str, title:str, x_label:str, y_label:str):
     plt.scatter( list(df.index), df[column], color='blue',marker='o', alpha=0.1)
     plt.title(title)
     plt.ylabel(y_label)
@@ -44,7 +56,7 @@ def create_scatterplot_price(df, column, title, x_label, y_label):
     plt.show()
 
 
-def calculate_null_ratios(df):
+def calculate_null_ratios(df:DataFrame):
     """
     Calculate the percentage of null values for each feature in a DataFrame.
 

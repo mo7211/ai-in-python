@@ -1,15 +1,18 @@
 # coding: utf-8
 
+import logging
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from utils import *  # Logger, create_scatterplot, calculate_null_ratios, create_barplot_null_values, create_barplot_year
+# Logger, create_scatterplot, calculate_null_ratios, create_barplot_null_values, create_barplot_year
+from utils import *
 
 
-def visualize(df, logger):
+def visualize(df):
     # Visualization before cleaning
-    logger.debug('Starting visualization')
+    logging.debug('Starting visualization')
 
     # Visualize null ratios
 
@@ -26,7 +29,8 @@ def visualize(df, logger):
                         "# of assets", "Year of construction")
 
     # Visualize price
-    create_scatterplot_price(df, 'price', "Real estate prices before cleaning", "Asset", "Price in Euro")
+    create_scatterplot_price(
+        df, 'price', "Real estate prices before cleaning", "Asset", "Price in Euro")
 
     # # ## Visualize distribution of cellar, lift,
 
