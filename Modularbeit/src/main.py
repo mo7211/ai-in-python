@@ -5,39 +5,26 @@ import pandas as pd
 
 from visualization import visualize_cleaning
 from utils import configurize_logger
-from data import clean_data, SplitOption
+from data import clean_data, prep_data
+import config
 
 
 def main():
-
-    config = {
-        'clean': True,
-        'preprocess': False,
-        'train': False,
-        'train_method': 'xx',
-        'split_option': SplitOption.WITH_INDEX,
-        'show_plots': False,
-        'input_data': 'Modularbeit/data/raw_data/Real Estate Dataset.csv',
-    }
-
-    df = pd.read_csv(
-        config['input_data'], sep=";")
-
     configurize_logger(__name__)
 
-    logging.info('Creating visualization before cleaning')
-    visualize_cleaning(df, "before cleaning", config['show_plots'])
+    df = pd.read_csv(
+        config.INPUT_DATA_PATH, sep=";")
 
-    logging.info('Clean data')
+    visualize_cleaning(df, "before cleaning", config.SHOW_PLOTS)
+    clean_data(df, config.SPLIT_OPTION)
 
-    cleaned_df = clean_data(df, config['split_option'])
+    cleaned_df = pd.read_csv(
+        config.SPLITTED_DATA_PATH)
+    visualize_cleaning(cleaned_df, "after cleaning", config.SHOW_PLOTS)
 
-    logging.info('Creating visualization after cleaning')
-    visualize_cleaning(cleaned_df, "after cleaning", config['show_plots'])
+    preprocessed_df = prep_data(cleaned_df)
 
-    # preprocessed_df = prep_data(cleaned_df)
-
-    # visualize_cleaning(preprocessed_df)
+    visualize_cleaning(preprocessed_df, "after preprocessing",config.SHOW_PLOTS)
 
 if __name__ == "__main__":
     main()

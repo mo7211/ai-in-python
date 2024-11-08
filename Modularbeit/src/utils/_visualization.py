@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pandas import DataFrame
 
+import config
 from utils._logging import get_time
 
 
@@ -93,14 +94,12 @@ def calculate_null_ratios(df: DataFrame):
     return df_is_null / df.shape[0] * 100
 
 
-IMAGES_PATH = Path('Modularbeit') / 'images' / \
-    time.strftime("%Y-%m-%d_%H-%M-%S")
-IMAGES_PATH.mkdir(parents=True, exist_ok=True)
+
 
 
 def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300):
 
-    path = IMAGES_PATH / f"{fig_id}.{fig_extension}"
+    path = config.IMAGES_PATH / f"{fig_id}.{fig_extension}"
     if tight_layout:
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)

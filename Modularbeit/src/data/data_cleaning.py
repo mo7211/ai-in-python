@@ -1,49 +1,68 @@
 import logging
+
+import config
 from typing import List
+
 
 from utils import *
 
 
 def clean_data(df: DataFrame, split_option: SplitOption):
-    logging.info(50*"=")
-    logging.info("Start data cleaning")
-    log_df_shape(df)
+    if config.CLEAN:
+        logging.info('Clean data')
 
-    cleaned_df = df
+        logging.info(50*"=")
+        logging.info("Start data cleaning")
+        log_df_shape(df)
 
-    delete_duplicates(cleaned_df)
+        cleaned_df = df
 
-    columns = ["rooms", "price", "area", "condition", "floor"]
-    drop_null_rows(cleaned_df, columns)
+        delete_duplicates(cleaned_df)
 
-    columns_to_drop = ['orientation', 'energy_costs',
-                       'total_floors', 'balkonies', 'loggia', 'index', 'type']
-    drop_column(cleaned_df, columns_to_drop)
+        columns = ["rooms", "price", "area", "condition", "floor"]
+        drop_null_rows(cleaned_df, columns)
 
-    clean_year_built(cleaned_df)
+        columns_to_drop = ['orientation', 'energy_costs',
+                           'total_floors', 'balkonies', 'loggia', 'index', 'type']
+        drop_column(cleaned_df, columns_to_drop)
 
-    clean_year_reconstructed(cleaned_df)
+        clean_year_built(cleaned_df)
 
-    replace_value_in_column(
-        cleaned_df, "condition", "New building", "Original condition")
+        clean_year_reconstructed(cleaned_df)
 
-    replace_value_in_column(
-        cleaned_df, "construction_type", np.nan, "Unknown")
+        replace_value_in_column(
+            cleaned_df, "condition", "New building", "Original condition")
 
-    replace_value_in_column(
-        cleaned_df, "certificate", np.nan, "Unknown")
+        replace_value_in_column(
+            cleaned_df, "construction_type", np.nan, "Unknown")
 
-    clean_rows_floor(cleaned_df)
+        replace_value_in_column(
+            cleaned_df, "certificate", np.nan, "Unknown")
 
-    clean_high_prices(cleaned_df)
+        clean_rows_floor(cleaned_df)
 
-    log_df_shape(cleaned_df)
+        clean_high_prices(cleaned_df)
 
-    df.to_csv('Modularbeit/data/cleaned_data/re_cleaned.csv')
+        log_df_shape(cleaned_df)
 
-    splitted_df = split_dataframe(cleaned_df, split_option)
+        # Clean types
+        columns_float = ['area',
+                         'environment',
+                         'quality_of_living',
+                         'safety',
+                         'transport',
+                         'services',
+                         'relax']
+        convert_column_to_type(cleaned_df, columns_float, float)
 
-    splitted_df.to_csv(
-        'Modularbeit/data/cleaned_data/re_cleaned_' + split_option.value + '.csv', index=False)
+        # columns_int = ['rooms', 'year_built', 'year_reconstructed', 'floor']
+        # convert_column_to_type(cleaned_df, columns_int, int)
 
-    return splitted_df
+        cleaned_df.to_csv(config.CLEANED_DATA_PATH, index=False)
+
+        splitted_df = split_dataframe(cleaned_df, split_option)
+
+        splitted_df.to_csv(
+            config.SPLITTED_DATA_PATH, index=False)
+
+        return splitted_df

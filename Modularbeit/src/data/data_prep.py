@@ -1,56 +1,61 @@
 import logging
 
+import config
 from utils import *
 
 
 def prep_data(df: DataFrame):
-    logging.info(50*"=")
-    logging.info("Start data preprocessing")
+    if config.PREPROCESS:
+        logging.info(50*"=")
+        logging.info("Start data preprocessing")
 
-    # binarize labels
-    binarize_labels(df, "name_nsi")
-    binarize_labels(df, "district")
-    binarize_labels(df, 'construction_type')
+        # binarize labels
+        binarize_labels(df, "name_nsi")
+        binarize_labels(df, "district")
+        binarize_labels(df, 'construction_type')
 
-    # scale Minmax
+        # scale Minmax
+        columns_minmax = ['price', 
+                          'area', 
+                          'year_built', 
+                          'last_reconstruction', 
+                          'floor', 
+                          'rooms', 
+                          'environment',
+                          'quality_of_living',
+                          'safety',
+                          'transport',
+                          'services',
+                          'relax']
+        scale_minmax(df, columns_minmax)
 
-    scale_minmax(df, 'price')
-    df['area'] = df['area'].str.replace(',', '.').astype(float)
-    scale_minmax(df, 'area')
+        # Map
+        condition_mapper = {'Development project': 1,
+                            'Under construction': 2,
+                            'Original condition': 3,
+                            'Partial reconstruction': 4,
+                            'Complete reconstruction': 5
+                            }
 
-    df['year_built'] = df['year_built'].astype(int)
-    scale_minmax(df, 'year_built')
+        map_values(df, 'condition', condition_mapper)
 
-    df['last_reconstruction'] = df['last_reconstruction'].astype(int)
-    scale_minmax(df, 'last_reconstruction')
+        certificates_mapper = {'Unknown': 1,
+                               'none': 2,
+                               'G': 3,
+                               'F': 4,
+                               'E': 5,
+                               'D': 6,
+                               'C': 7,
+                               'B': 8,
+                               'A': 9
+                               }
 
-    df['floor'] = df['floor'].astype(int)
-    scale_minmax(df, 'floor')
+        map_values(df, 'certificate', certificates_mapper)
 
-    scale_minmax(df, 'rooms')
+        split_option = config.SPLIT_OPTION
 
-    condition_mapper = {'Development project': 1,
-                        'Under construction': 2,
-                        'Original condition': 3,
-                        'Partial reconstruction': 4,
-                        'Complete reconstruction': 5
-                        }
+        logging.info("Export preprocessed data")
+        df.to_csv('Modularbeit/data/features/re_preprosessed_' +
+                  split_option.value + '.csv', index=False)
 
-    map_values(df, 'condition', condition_mapper)
-
-    certificates_mapper = {'Unknown': 1,
-                           'none': 2,
-                           'G': 3,
-                           'F': 4,
-                           'E': 5,
-                           'D': 6,
-                           'C': 7,
-                           'B': 8,
-                           'A': 9
-                           }
-
-    map_values(df, 'certificate', condition_mapper)
-
-    df.to_csv('Modularbeit/data/features/re_preprosessed.csv')
-
-    return df
+        return df
