@@ -1,34 +1,43 @@
+# coding: utf-8
+
 import logging
 import pandas as pd
-import os.path as osp
-import time
 
-from visualization import visualize
-from utils import configurize_logger, log_versions
-from data import clean_data, prep_data, SplitOption
+from visualization import visualize_cleaning
+from utils import configurize_logger
+from data import clean_data, SplitOption
 
 
 def main():
-    # log_versions()
+
+    config = {
+        'clean': True,
+        'preprocess': False,
+        'train': False,
+        'train_method': 'xx',
+        'split_option': SplitOption.WITH_INDEX,
+        'show_plots': False,
+        'input_data': 'Modularbeit/data/raw_data/Real Estate Dataset.csv',
+    }
 
     df = pd.read_csv(
-        'Modularbeit/data/raw_data/Real Estate Dataset.csv', sep=';')
+        config['input_data'], sep=";")
 
     configurize_logger(__name__)
 
     logging.info('Creating visualization before cleaning')
-    visualize(df)
+    visualize_cleaning(df, "before cleaning", config['show_plots'])
 
     logging.info('Clean data')
-    split_option = SplitOption.WITH_INDEX
-    cleaned_df = clean_data(df,split_option)
+
+    cleaned_df = clean_data(df, config['split_option'])
 
     logging.info('Creating visualization after cleaning')
-    visualize(cleaned_df)
+    visualize_cleaning(cleaned_df, "after cleaning", config['show_plots'])
 
-    preprocessed_df = prep_data(cleaned_df)
+    # preprocessed_df = prep_data(cleaned_df)
 
-    visualize(preprocessed_df)
+    # visualize_cleaning(preprocessed_df)
 
-
-main()
+if __name__ == "__main__":
+    main()

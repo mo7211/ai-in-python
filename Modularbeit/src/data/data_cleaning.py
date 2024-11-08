@@ -4,7 +4,7 @@ from typing import List
 from utils import *
 
 
-def clean_data(df: DataFrame, split_option:SplitOption):
+def clean_data(df: DataFrame, split_option: SplitOption):
     logging.info(50*"=")
     logging.info("Start data cleaning")
     log_df_shape(df)
@@ -43,6 +43,7 @@ def clean_data(df: DataFrame, split_option:SplitOption):
 
     splitted_df = split_dataframe(cleaned_df, split_option)
 
-    splitted_df.to_csv('Modularbeit/data/cleaned_data/re_cleaned' + split_option + '.csv')
+    splitted_df.to_csv(
+        'Modularbeit/data/cleaned_data/re_cleaned_' + split_option.value + '.csv', index=False)
 
     return splitted_df
