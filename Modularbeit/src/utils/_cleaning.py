@@ -1,7 +1,8 @@
+from enum import Enum
 import logging
 import numpy as np
 from pandas import DataFrame
-from typing import List
+from typing import List, Union
 
 
 def delete_duplicates(df: DataFrame):
@@ -87,3 +88,25 @@ def clean_high_prices(df: DataFrame):
     rows_after = df.shape[0]
     logging.info(str(rows_before - rows_after) + ' rows deleted.')
     return df
+
+
+class SplitOption(Enum):
+    WITH_INDEX = 'with_index'
+    WITHOUT_INDEX = 'without_index'
+
+def split_dataframe(df:DataFrame, option: Union[SplitOption, str]) -> None:
+    if isinstance(option, str):
+        option = SplitOption(option)
+
+    if option == SplitOption.WITH_INDEX:
+        logging.info('splitting dataframe with index')
+        df_with_index = df.dropna(axis=0, how='any', subset=['quality_of_living', 'safety', 'transport', 'services', 'relax','environment'], inplace=False)
+        return df_with_index
+    
+    elif option == SplitOption.WITHOUT_INDEX:
+        logging.info('splitting dataframe without index')
+        df_without_index = df.drop(['quality_of_living', 'safety', 'transport', 'services', 'relax','environment'], axis=1, inplace=False)
+        return df_without_index
+    else:
+        raise ValueError("Ungültige Option ausgewählt.")
+

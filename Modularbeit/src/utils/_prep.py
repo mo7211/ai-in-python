@@ -21,3 +21,21 @@ def scale_minmax(df: DataFrame, column: str):
 
 def map_values(df: DataFrame, column: str, condition_mapper: dict):
     df[column] = df[column].replace(condition_mapper)
+
+    # # ## Split data-set
+    # minmax_scale = MinMaxScaler(feature_range=(0, 1))
+
+    # columns = ['environment',
+    #         'quality_of_living',
+    #         'safety',
+    #         'transport',	
+    #         'services',	
+    #         'relax']
+
+    # def reshape_column(df_with_index, minmax_scale, column):
+    #     df_with_index[column] = minmax_scale.fit_transform(df_with_index[column].values.reshape(-1, 1))
+    #     return df_with_index
+
+    # for column in columns:
+    #     reshape_column(df_with_index, minmax_scale, column)
+    #     print(column)

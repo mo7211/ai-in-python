@@ -5,7 +5,7 @@ import time
 
 from visualization import visualize
 from utils import configurize_logger, log_versions
-from data import clean_data, prep_data
+from data import clean_data, prep_data, SplitOption
 
 
 def main():
@@ -20,7 +20,8 @@ def main():
     visualize(df)
 
     logging.info('Clean data')
-    cleaned_df = clean_data(df)
+    split_option = SplitOption.WITH_INDEX
+    cleaned_df = clean_data(df,split_option)
 
     logging.info('Creating visualization after cleaning')
     visualize(cleaned_df)

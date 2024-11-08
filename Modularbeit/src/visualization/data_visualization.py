@@ -6,13 +6,15 @@ import logging
 from utils import *
 
 
-def visualize(df:DataFrame):
+def visualize(df: DataFrame):
     # Visualization before cleaning
     logging.debug('Starting visualization')
 
     # Visualize null ratios
 
     null_ratios = calculate_null_ratios(df)
+
+    # fix case no null ratios
     create_barplot_null_values(
         null_ratios, "Percentage of null values", "Null values in %", "Columns")
 
