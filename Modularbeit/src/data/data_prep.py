@@ -1,8 +1,5 @@
 import logging
 
-from sklearn.preprocessing import LabelBinarizer
-from sklearn.preprocessing import MinMaxScaler
-
 from utils import *
 
 
@@ -10,9 +7,12 @@ def prep_data(df: DataFrame):
     logging.info(50*"=")
     logging.info("Start data preprocessing")
 
+    # binarize labels
     binarize_labels(df, "name_nsi")
     binarize_labels(df, "district")
     binarize_labels(df, 'construction_type')
+
+    # scale Minmax
 
     scale_minmax(df, 'price')
     df['area'] = df['area'].str.replace(',', '.').astype(float)
@@ -51,9 +51,6 @@ def prep_data(df: DataFrame):
 
     map_values(df, 'certificate', condition_mapper)
 
-    
-
     df.to_csv('Modularbeit/data/features/re_preprosessed.csv')
-
 
     return df
