@@ -109,4 +109,15 @@ def split_dataframe(df:DataFrame, option: Union[SplitOption, str]) -> None:
         return df_without_index
     else:
         raise ValueError("Ungültige Option ausgewählt.")
+    
+def convert_column_to_type(df:DataFrame, columns:list[str], type=float)-> None:
+    
+    for c in columns:
+        logging.info(f'converting column {c} to {str(type)}')
+        if type == float:
+            df[c] = df[c].str.replace(',', '.').astype(type)
+        elif type == int:
+            df[c] = df[c].str.astype(type)
+
+
 

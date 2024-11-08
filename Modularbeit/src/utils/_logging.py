@@ -2,7 +2,10 @@ import logging
 import time
 import os.path as osp
 
+
 from pandas import DataFrame
+
+import config
 
 
 def get_time():
@@ -23,13 +26,13 @@ def configurize_logger(name: str):
     Args:
     name (str) : The name of the logger.        
     '''
-    path = 'Modularbeit/logging'
     logging.basicConfig(
-        filename=create_filename(path, name),
+        filename=create_filename(config.LOGGING_PATH, name),
         encoding='utf-8',
         level=logging.INFO,
         format='%(asctime)s %(levelname)-8s %(funcName)20s() %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S')
-    
-def log_df_shape(df:DataFrame):
+
+
+def log_df_shape(df: DataFrame):
     logging.info("The data frame has {} rows and {} columns".format(*df.shape))
