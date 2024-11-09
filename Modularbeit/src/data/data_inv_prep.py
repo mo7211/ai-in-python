@@ -4,15 +4,15 @@ import config
 from utils import *
 
 
-def prep_data(df: DataFrame):
+def inverse_prep_data(df: DataFrame):
     if config.PREPROCESS:
         logging.info(50*"=")
-        logging.info("Start data preprocessing")
+        logging.info("Start inverse preprocessed data")
 
         # binarize labels
         columns_binarize = ['name_nsi', 'district', 'construction_type']
 
-        binarize_labels(df, columns_binarize)
+        inverse_binarize_labels(df, columns_binarize)
 
         # scale Minmax
         columns_minmax = ['price',
@@ -27,21 +27,16 @@ def prep_data(df: DataFrame):
                           'transport',
                           'services',
                           'relax']
-        scale_minmax(df, columns_minmax)
+        inverse_minmax(df, columns_minmax)
 
         # Map
 
-        condition_mapper = config.FEATURE_MAPPER['condition']
-        map_values(df, 'condition', condition_mapper)
+        inverse_condition_mapper = inverse_mapper(
+            config.FEATURE_MAPPER['condition'])
+        map_values(df, 'condition', inverse_condition_mapper)
 
-
-        certificates_mapper = config.FEATURE_MAPPER['certificate']
-        map_values(df, 'certificate', certificates_mapper)
-
-        split_option = config.SPLIT_OPTION
-
-        logging.info("Export preprocessed data")
-        path = config.PREPROCESSED_DATA_PATH
-        df.to_csv(path, index=False)
+        inverse_certificates_mapper = inverse_mapper(
+            config.FEATURE_MAPPER['certificate'])
+        map_values(df, 'certificate', inverse_certificates_mapper)
 
         return df
