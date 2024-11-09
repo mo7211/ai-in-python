@@ -4,14 +4,15 @@ from utils._cleaning import SplitOption
 
 # Options
 
-CLEAN = True
-PREPROCESS = True
-TRAIN = False
+CLEAN = False
+PREPROCESS = False
+TRAIN = True
 TRAIN_METHOD = "xx"
-TEST = False
 
 SPLIT_OPTION = SplitOption.WITH_INDEX
 SHOW_PLOTS = False
+TARGET = ''
+TEST_SIZE = 0.3
 
 # Data
 
@@ -20,6 +21,10 @@ CLEANED_DATA_PATH = 'Modularbeit/data/cleaned_data/re_cleaned.csv'
 SPLITTED_DATA_PATH = 'Modularbeit/data/cleaned_data/re_cleaned_' + \
     SPLIT_OPTION.value + '.csv'
 PREPROCESSED_DATA_PATH = 'Modularbeit/data/features/re_preprosessed_' + \
+                  SPLIT_OPTION.value + '.csv'
+FEATURE_DATA_PATH = 'Modularbeit/data/features/re_features_' + TARGET + '_' +\
+                  SPLIT_OPTION.value + '.csv'
+TARGET_DATA_PATH = 'Modularbeit/data/features/re_target_' + TARGET + '_' +\
                   SPLIT_OPTION.value + '.csv'
 
 # Paths

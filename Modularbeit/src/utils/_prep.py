@@ -1,7 +1,10 @@
 
 
+import ast
 import logging
+from turtle import pd
 
+import numpy as np
 from pandas import DataFrame
 from sklearn.naive_bayes import LabelBinarizer
 from sklearn.preprocessing import MinMaxScaler
@@ -56,3 +59,13 @@ def map_values(df: DataFrame, column: str, condition_mapper: dict):
 
 def inverse_mapper(mapper: dict):
     return {v: k for k, v in mapper.items()}
+
+def read_prepped_data(path: str, columns:list[str]):
+    def convert_to_array(array_string):
+        # Return a numpy array from the evaluated string
+        return np.array(ast.literal_eval(array_string.replace('\n', ' ').strip().replace(' ', ',')))
+    df = pd.read_csv(path)
+    for c in columns:
+        df[c] = df[c].apply(convert_to_array)
+
+    return df

@@ -41,7 +41,10 @@ def prep_data(df: DataFrame):
         split_option = config.SPLIT_OPTION
 
         logging.info("Export preprocessed data")
-        path = config.PREPROCESSED_DATA_PATH
-        df.to_csv(path, index=False)
+        df.to_csv(config.PREPROCESSED_DATA_PATH, index=False)
+        
+        df['price'].to_csv(config.TARGET_DATA_PATH, index=False)
+
+        df.drop(columns=['price']).to_csv(config.FEATURE_DATA_PATH, index=False)
 
         return df

@@ -6,6 +6,7 @@ import pandas as pd
 from visualization import visualize_cleaning
 from utils import configurize_logger
 from data import clean_data, prep_data
+from models import sdg_regression
 import config
 
 
@@ -13,13 +14,11 @@ def main():
     configurize_logger(__name__)
     show_plots = config.SHOW_PLOTS
 
-
     logging.info('Start script')
 
     df = pd.read_csv(
         config.INPUT_DATA_PATH, sep=";")
 
-    
     visualize_cleaning(df, "before cleaning", show_plots)
     clean_data(df, config.SPLIT_OPTION)
 
@@ -29,11 +28,22 @@ def main():
 
     prep_data(cleaned_df)
 
+    config.TARGET = 'price'
+
     preprocessed_df = pd.read_csv(
         config.PREPROCESSED_DATA_PATH)
 
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
+
+    y = pd.read_csv(
+        config.TARGET_DATA_PATH)
+    X = pd.read_csv(config.FEATURE_DATA_PATH)
+    # drop columns 'name_msi', 'construction_type', 'district' from X
+    X = X.drop(['name_nsi', 'construction_type', 'district'], axis='columns')
+
+    sdg_regression(X, y)
+
     logging.info('Script succesfully ended')
 
 
