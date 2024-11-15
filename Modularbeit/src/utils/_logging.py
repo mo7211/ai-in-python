@@ -30,7 +30,7 @@ def configurize_logger(name: str):
         filename=create_filename(config.LOGGING_PATH, name),
         encoding='utf-8',
         level=logging.INFO,
-        format='%(asctime)s %(levelname)-8s %(funcName)20s() %(message)s',
+        format='%(asctime)s %(levelname)-8s %(funcName)30s() %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S')
 
 

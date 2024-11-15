@@ -30,17 +30,18 @@ def main():
 
     config.TARGET = 'price'
 
-    preprocessed_df = pd.read_csv(
-        config.PREPROCESSED_DATA_PATH)
+    # preprocessed_df = pd.read_parquet(
+    #     config.PREPROCESSED_DATA_PATH + '.parquet')
+    preprocessed_df = pd.read_csv(config.PREPROCESSED_DATA_PATH + '.csv')
 
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
+    
+    # target data
+    y = preprocessed_df['price']
 
-    y = pd.read_csv(
-        config.TARGET_DATA_PATH)
-    X = pd.read_csv(config.FEATURE_DATA_PATH)
-    # drop columns 'name_msi', 'construction_type', 'district' from X
-    X = X.drop(['name_nsi', 'construction_type', 'district'], axis='columns')
+    # features
+    X = preprocessed_df.drop(columns=['price'])
 
     X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=config.TEST_SIZE, random_state=42)
