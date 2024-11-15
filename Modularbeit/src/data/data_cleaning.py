@@ -2,11 +2,12 @@ import logging
 
 import config
 from typing import List
+from utils._logging import LogExecutionTime
 
 
 from utils import *
 
-
+@LogExecutionTime
 def clean_data(df: DataFrame, split_option: SplitOption):
     if config.CLEAN:
         logging.info('Clean data')

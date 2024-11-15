@@ -30,24 +30,26 @@ def main():
 
     config.TARGET = 'price'
 
-    preprocessed_df = pd.read_csv(
+    preprocessed_df = pd.read_parquet(
         config.PREPROCESSED_DATA_PATH)
 
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
 
-    y = pd.read_csv(
-        config.TARGET_DATA_PATH)
-    X = pd.read_csv(config.FEATURE_DATA_PATH)
-    # drop columns 'name_msi', 'construction_type', 'district' from X
-    X = X.drop(['name_nsi', 'construction_type', 'district'], axis='columns')
+    # y = pd.read_csv(
+    #     config.TARGET_DATA_PATH)
+    # X = df = pd.read_hdf(config.FEATURE_DATA_PATH, 'df')
+    # # pd.read_csv(config.FEATURE_DATA_PATH)
 
-    X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=config.TEST_SIZE, random_state=42)
+    # # drop columns 'name_msi', 'construction_type', 'district' from X
+    # # X = X.drop(['name_nsi', 'construction_type', 'district'], axis='columns')
 
-    sdg_regression(X_train, X_test, y_train, y_test)
+    # X_train, X_test, y_train, y_test = train_test_split(
+    #         X, y, test_size=config.TEST_SIZE, random_state=42)
 
-    regression(X_train, X_test, y_train, y_test)
+    # sdg_regression(X_train, X_test, y_train, y_test)
+
+    # regression(X_train, X_test, y_train, y_test)
 
     logging.info('Script succesfully ended')
 

@@ -3,7 +3,7 @@ import logging
 import config
 from utils import *
 
-
+@LogExecutionTime
 def prep_data(df: DataFrame):
     if config.PREPROCESS:
         logging.info(50*"=")
@@ -41,7 +41,8 @@ def prep_data(df: DataFrame):
         split_option = config.SPLIT_OPTION
 
         logging.info("Export preprocessed data")
-        df.to_csv(config.PREPROCESSED_DATA_PATH, index=False)
+        df.to_parquet(config.PREPROCESSED_DATA_PATH, index=False)
+        # df.to_csv(config.PREPROCESSED_DATA_PATH, index=False)
         
         df['price'].to_csv(config.TARGET_DATA_PATH, index=False)
 
