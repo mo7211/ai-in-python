@@ -36,3 +36,15 @@ def configurize_logger(name: str):
 
 def log_df_shape(df: DataFrame):
     logging.info("The data frame has {} rows and {} columns".format(*df.shape))
+
+class LogExecutionTime:
+    def __init__(self, function):
+        self.function = function
+    
+    def __call__(self, *args, **kwargs):
+        start_time = time.time()
+        result = self.function(*args, **kwargs)
+        end_time = time.time()
+        execution_time = end_time - start_time
+        logging.info(f"Function '{self.function.__name__}' executed in {execution_time:.4f} seconds.")
+        return result

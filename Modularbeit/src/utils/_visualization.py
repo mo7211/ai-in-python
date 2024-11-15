@@ -103,6 +103,20 @@ def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300
     if tight_layout:
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)
+
+def visualize_regression(x_test:DataFrame, y_test:DataFrame)->None:
+    # plt.plot(x, y_predict, "r-", label="Regression")
+    plt.plot(x_test, y_test, "b.")
+
+    # extra code – beautifies and saves Figure 4–2
+    plt.xlabel("$x_1$")
+    plt.ylabel("$y$", rotation=0)
+    plt.axis([0, 2, 0, 15])
+    plt.grid()
+    plt.legend(loc="upper left")
+    save_fig("linear_model_predictions_plot")
+
+    return None
     
 
     # # ## Visualize distribution of cellar, lift,
