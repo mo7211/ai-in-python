@@ -21,11 +21,7 @@ CLEANED_DATA_PATH = 'Modularbeit/data/cleaned_data/re_cleaned.csv'
 SPLITTED_DATA_PATH = 'Modularbeit/data/cleaned_data/re_cleaned_' + \
     SPLIT_OPTION.value + '.csv'
 PREPROCESSED_DATA_PATH = 'Modularbeit/data/features/re_preprosessed_' + \
-                  SPLIT_OPTION.value + '.parquet'
-FEATURE_DATA_PATH = 'Modularbeit/data/features/re_features_' + TARGET + '_' +\
-                  SPLIT_OPTION.value + '.csv'
-TARGET_DATA_PATH = 'Modularbeit/data/features/re_target_' + TARGET + '_' +\
-                  SPLIT_OPTION.value + '.csv'
+    SPLIT_OPTION.value
 
 # Paths
 

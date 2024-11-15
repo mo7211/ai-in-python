@@ -9,11 +9,6 @@ def prep_data(df: DataFrame):
         logging.info(50*"=")
         logging.info("Start data preprocessing")
 
-        # binarize labels
-        columns_binarize = ['name_nsi', 'district', 'construction_type']
-
-        binarize_labels(df, columns_binarize)
-
         # scale Minmax
         columns_minmax = ['price',
                           'area',
@@ -27,25 +22,23 @@ def prep_data(df: DataFrame):
                           'transport',
                           'services',
                           'relax']
-        scale_minmax(df, columns_minmax)
+        scaled_df = scale_minmax(df, columns_minmax)
+
+        # binarize labels
+        columns_binarize = ['name_nsi', 'district', 'construction_type']
+
+        binarized_df = binarize_labels(scaled_df, columns_binarize)
 
         # Map
-
         condition_mapper = config.FEATURE_MAPPER['condition']
-        map_values(df, 'condition', condition_mapper)
+        map_values(binarized_df, 'condition', condition_mapper)
 
 
         certificates_mapper = config.FEATURE_MAPPER['certificate']
-        map_values(df, 'certificate', certificates_mapper)
-
-        split_option = config.SPLIT_OPTION
+        map_values(binarized_df, 'certificate', certificates_mapper)
 
         logging.info("Export preprocessed data")
-        df.to_parquet(config.PREPROCESSED_DATA_PATH, index=False)
-        # df.to_csv(config.PREPROCESSED_DATA_PATH, index=False)
-        
-        df['price'].to_csv(config.TARGET_DATA_PATH, index=False)
-
-        df.drop(columns=['price']).to_csv(config.FEATURE_DATA_PATH, index=False)
+        binarized_df.to_parquet(config.PREPROCESSED_DATA_PATH + '.parquet', index=False)
+        binarized_df.to_csv(config.PREPROCESSED_DATA_PATH + '.csv', index=False)
 
         return df
