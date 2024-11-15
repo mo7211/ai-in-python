@@ -6,7 +6,7 @@ import pandas as pd
 from visualization import visualize_cleaning
 from utils import configurize_logger
 from data import clean_data, prep_data
-from models import sdg_regression
+from models import *
 import config
 
 
@@ -42,7 +42,12 @@ def main():
     # drop columns 'name_msi', 'construction_type', 'district' from X
     X = X.drop(['name_nsi', 'construction_type', 'district'], axis='columns')
 
-    sdg_regression(X, y)
+    X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=config.TEST_SIZE, random_state=42)
+
+    sdg_regression(X_train, X_test, y_train, y_test)
+
+    regression(X_train, X_test, y_train, y_test)
 
     logging.info('Script succesfully ended')
 
