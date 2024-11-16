@@ -1,10 +1,11 @@
 # coding: utf-8
 
 import logging
+from matplotlib import pyplot as plt
 import pandas as pd
 
 from visualization import visualize_cleaning
-from utils import configurize_logger
+from utils import configurize_logger, save_fig
 from data import clean_data, prep_data
 from models import *
 import config
@@ -36,7 +37,7 @@ def main():
 
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
-    
+
     # target data
     y = preprocessed_df['price']
 
@@ -44,11 +45,20 @@ def main():
     X = preprocessed_df.drop(columns=['price'])
 
     X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=config.TEST_SIZE, random_state=42)
+        X, y, test_size=config.TEST_SIZE, random_state=42)
 
     sdg_regression(X_train, X_test, y_train, y_test)
 
-    regression(X_train, X_test, y_train, y_test)
+    plt.figure(figsize=(6, 4))
+    plt.plot(X_test['area'], y_test, "b.")
+    plt.xlabel("$x_1$")
+    plt.ylabel("$y$", rotation=0)
+    # plt.axis([0, 2, 0, 15])
+    plt.grid()
+    save_fig(plt, "sdg_regression")
+    plt.show()
+
+    # regression(X_train, X_test, y_train, y_test)
 
     logging.info('Script succesfully ended')
 

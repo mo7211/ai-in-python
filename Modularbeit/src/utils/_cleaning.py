@@ -89,6 +89,15 @@ def clean_high_prices(df: DataFrame):
     logging.info(str(rows_before - rows_after) + ' rows deleted.')
     return df
 
+def clean_big_area(df: DataFrame):
+    rows_before = df.shape[0]
+
+    df.drop(df[df['area'] > 1000.0].index, inplace=True)
+
+    rows_after = df.shape[0]
+    logging.info(str(rows_before - rows_after) + ' rows deleted.')
+    return df
+
 
 class SplitOption(Enum):
     WITH_INDEX = 'with_index'

@@ -36,6 +36,7 @@ def inverse_binarize_labels(df: DataFrame, columns: list[str]) -> None:
         if df.columns.str.contains(c).any():
             one_hot = LabelBinarizer()
             df[c] = list(one_hot.inverse_transform(config.FEATURE_MAPPER[c]))
+            inverse_expand_feature(df, c)
 
 
 def scale_minmax(df: DataFrame, columns: list[str]):

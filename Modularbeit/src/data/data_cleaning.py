@@ -42,10 +42,6 @@ def clean_data(df: DataFrame, split_option: SplitOption):
 
         clean_rows_floor(cleaned_df)
 
-        clean_high_prices(cleaned_df)
-
-        log_df_shape(cleaned_df)
-
         # Clean types
         columns_float = ['area',
                          'environment',
@@ -55,6 +51,11 @@ def clean_data(df: DataFrame, split_option: SplitOption):
                          'services',
                          'relax']
         convert_column_to_type(cleaned_df, columns_float, float)
+
+        clean_high_prices(cleaned_df)
+        clean_big_area(cleaned_df)
+
+        log_df_shape(cleaned_df)
 
         # columns_int = ['rooms', 'year_built', 'year_reconstructed', 'floor']
         # convert_column_to_type(cleaned_df, columns_int, int)
