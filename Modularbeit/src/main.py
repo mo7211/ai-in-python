@@ -2,7 +2,10 @@
 
 import logging
 from matplotlib import pyplot as plt
+import numpy as np
 import pandas as pd
+
+from sklearn.preprocessing import add_dummy_feature
 
 from visualization import visualize_cleaning
 from utils import configurize_logger, save_fig
@@ -47,16 +50,26 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=config.TEST_SIZE, random_state=42)
 
-    sdg_regression(X_train, X_test, y_train, y_test)
+    sdg_reg = sdg_regression(X_train, X_test, y_train, y_test)
 
-    plt.figure(figsize=(6, 4))
-    plt.plot(X_test['area'], y_test, "b.")
-    plt.xlabel("$x_1$")
-    plt.ylabel("$y$", rotation=0)
-    # plt.axis([0, 2, 0, 15])
-    plt.grid()
-    save_fig(plt, "sdg_regression")
-    plt.show()
+    # # to-do how can i plot the solution in two dimensions area and price?
+
+    # X_new = np.array([X_test['area'].min, X_test['area'].max])
+    # y_predict = sdg_reg.predict()
+
+    # plt.plot(X_test['area'], y_test, "b.")
+    # plt.xlabel("$x_1$")
+    # plt.ylabel("$y$", rotation=0)
+    # # plt.axis([0, 2, 0, 15])
+    # plt.grid()
+    # save_fig(plt, "sdg_regression")
+
+    # plt.figure(figsize=(6, 4))  # extra code – not needed, just formatting
+    # plt.plot(X_new, y_predict, "r-", label="Predictions")
+    # plt.plot(X, y, "b.")
+
+
+    # plt.show()
 
     # regression(X_train, X_test, y_train, y_test)
 
