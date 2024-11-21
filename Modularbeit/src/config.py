@@ -4,10 +4,9 @@ from utils._cleaning import SplitOption
 
 # Options
 
-CLEAN = True
-PREPROCESS = True
+CLEAN = False
+PREPROCESS = False
 TRAIN = True
-TRAIN_METHOD = "xx"
 
 SPLIT_OPTION = SplitOption.WITH_INDEX
 SHOW_PLOTS = False
