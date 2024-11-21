@@ -16,7 +16,9 @@ import config
 
 
 def main():
-    configurize_logger(__name__)
+    config.METHOD = config.METHODS.DecisionTree
+
+    configurize_logger(config.METHOD.name)
     show_plots = config.SHOW_PLOTS
 
     logging.info('Start script')
@@ -33,17 +35,21 @@ def main():
 
     prep_data(cleaned_df)
 
-    config.TARGET = 'price'
-
-    # preprocessed_df = pd.read_parquet(
-    #     config.PREPROCESSED_DATA_PATH + '.parquet')
     preprocessed_df = pd.read_csv(config.PREPROCESSED_DATA_PATH + '.csv')
 
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
 
     # target data
-    train_regression(preprocessed_df)
+    config.TARGET = 'price'
+
+    y, X = define_target(preprocessed_df, config.TARGET)
+    config.METHOD = config.METHODS.SGDRegressor
+    train_regression(X, y)
+    config.METHOD = config.METHODS.LinearRegression
+    train_regression(X, y)
+    config.METHOD = config.METHODS.DecisionTree
+    train_decision_tree(X, y)
 
     logging.info('Script succesfully ended')
 

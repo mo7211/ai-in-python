@@ -1,12 +1,29 @@
+from enum import Enum
 from pathlib import Path
 import time
+
+from sklearn.linear_model import SGDRegressor
 from utils._cleaning import SplitOption
 
+class METHODS(Enum):
+    SGDRegressor = 'SGDRegressor'
+    LinearRegression = 'LinearRegression'
+    DecisionTree = 'DecisionTree'
+    RandomForrest = 'RandomForrest'
+    SVM = 'SVM'
+    kmeans = 'kmeans'
+    DBScan = 'DBScan'
+    NeuralNetwork = 'NeuralNetwork'
+    
+
 # Options
+NAME = 'DecisionTree'
 
 CLEAN = False
 PREPROCESS = False
 TRAIN = True
+
+
 
 SPLIT_OPTION = SplitOption.WITH_INDEX
 SHOW_PLOTS = False
