@@ -5,23 +5,22 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 
-from sklearn.preprocessing import add_dummy_feature
-
 
 from visualization import visualize_cleaning
-from utils import configurize_logger, save_fig, visualize_sdg_regressor
+from utils import configurize_logger, discretize_feature
 from data import clean_data, prep_data
 from models import *
 import config
+from config import ModellingMethods
 
 
 def main():
-    config.METHOD = config.METHODS.DecisionTree
-
     configurize_logger(config.METHOD.name)
     show_plots = config.SHOW_PLOTS
 
     logging.info('Start script')
+
+    # cleaning
 
     df = pd.read_csv(
         config.INPUT_DATA_PATH, sep=";")
@@ -35,21 +34,28 @@ def main():
 
     prep_data(cleaned_df)
 
+    # preprocessing
+
     preprocessed_df = pd.read_csv(config.PREPROCESSED_DATA_PATH + '.csv')
 
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
 
-    # target data
+    # modelling
+    if not config.TRAIN:
+        config.METHOD = None
+    config.METHOD = ModellingMethods.PolynomialRegression
+
     config.TARGET = 'price'
 
     y, X = define_target(preprocessed_df, config.TARGET)
-    config.METHOD = config.METHODS.SGDRegressor
+
+    n_bins = 1000
+    binned_y = discretize_feature(y, n_bins)
+
     train_regression(X, y)
-    config.METHOD = config.METHODS.LinearRegression
-    train_regression(X, y)
-    config.METHOD = config.METHODS.DecisionTree
-    train_decision_tree(X, y)
+    # config.METHOD = ModellingMethods.DecisionTree
+    train_decision_tree(X, binned_y)
 
     logging.info('Script succesfully ended')
 
