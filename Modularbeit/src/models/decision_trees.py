@@ -9,7 +9,7 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-from utils._models import log_mean_squared_error
+from utils._models import log_metrics
 import config
 from utils._logging import LogExecutionTime
 from utils._train import define_target
@@ -18,7 +18,7 @@ from utils._train import define_target
 @LogExecutionTime
 def train_decision_tree(X: DataFrame, y: DataFrame):
 
-    if config.METHOD == config.ModellingMethods.DecisionTree:
+    if config.MODEL_METHOD == config.ModellingMethods.DecisionTree:
         # generate the classification object
         logging.info('Start training decision tree')
 

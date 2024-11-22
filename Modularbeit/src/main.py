@@ -15,7 +15,7 @@ from config import ModellingMethods
 
 
 def main():
-    configurize_logger(config.METHOD.name)
+    configurize_logger(config.MODEL_METHOD.name)
     show_plots = config.SHOW_PLOTS
 
     logging.info('Start script')
@@ -41,11 +41,8 @@ def main():
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
 
-    # modelling
-    if not config.TRAIN:
-        config.METHOD = None
-    config.METHOD = ModellingMethods.PolynomialRegression
-
+    # training
+    logging.info('Start training')
     config.TARGET = 'price'
 
     y, X = define_target(preprocessed_df, config.TARGET)
@@ -54,7 +51,6 @@ def main():
     binned_y = discretize_feature(y, n_bins)
 
     train_regression(X, y)
-    # config.METHOD = ModellingMethods.DecisionTree
     train_decision_tree(X, binned_y)
 
     logging.info('Script succesfully ended')

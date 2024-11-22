@@ -16,6 +16,12 @@ class ModellingMethods(Enum):
     kmeans = 'kmeans'
     DBScan = 'DBScan'
     NeuralNetwork = 'NeuralNetwork'
+    NoTraining = 'NoTraining'
+
+
+class HyperparamMethods(Enum):
+    RandomizedSearchCV = 'RandomizedSearchCV'
+    GridSearchCV = 'GridSearchCV'
 
 
 class HyperparametersFitting(Enum):
@@ -26,16 +32,25 @@ class HyperparametersFitting(Enum):
 # Options
 NAME = 'DecisionTree'
 
+
 CLEAN = False
 PREPROCESS = False
-TRAIN = True
-
+MODEL_METHOD = ModellingMethods.PolynomialRegression
+HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
 
 SPLIT_OPTION = SplitOption.WITH_INDEX
 SHOW_PLOTS = False
-TARGET = ''
+TARGET = 'price'
 TEST_SIZE = 0.3
-POLY_DEGREE = 2
+POLY_DEGREES = [1, 2, 3]
+
+# Hyperparameters
+
+POLY_REG_DISTRIBUTION_RANDOM = dict(tol=[1e-5], penalty=[None, 'l2', 'l1', 'elasticnet'], eta0=[
+    0.05, 0.01, 0.005])
+POLY_REG_DISTRIBUTION_GRID = dict(max_iter=[1000], tol=[
+                                  1e-5], penalty=[None], eta0=[0.01], n_iter_no_change=[100], random_state=[42])
+
 
 # Data
 
@@ -49,7 +64,7 @@ PREPROCESSED_DATA_PATH = 'Modularbeit/data/features/re_preprosessed_' + \
 # Paths
 
 IMAGES_PATH = Path('Modularbeit') / 'images' / \
-    time.strftime("%Y-%m-%d_%H-%M-%S")
+    (MODEL_METHOD.name + "_" + time.strftime("%Y-%m-%d_%H-%M-%S"))
 IMAGES_PATH.mkdir(parents=True, exist_ok=True)
 LOGGING_PATH = 'Modularbeit/logging'
 
