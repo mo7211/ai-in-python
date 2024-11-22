@@ -3,12 +3,13 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 from pandas import DataFrame
+from sklearn.linear_model import SGDRegressor
 
 import config
 from utils._logging import get_time
 
 
-def create_scatterplot(df, column_name, title, y_label, x_label, x_ticks, show_plot:bool=True):
+def create_scatterplot(df, column_name, title, y_label, x_label, x_ticks, show_plot: bool = True):
     plt.scatter(list(df.index), df[column_name],
                 color='blue', marker='x', alpha=0.1)
     plt.title(title)
@@ -21,7 +22,7 @@ def create_scatterplot(df, column_name, title, y_label, x_label, x_ticks, show_p
     plt.clf()
 
 
-def create_barplot_null_values(null_percentages, title, y_label, x_label, show_plot:bool=True):
+def create_barplot_null_values(null_percentages, title, y_label, x_label, show_plot: bool = True):
     plt.bar(list(null_percentages.index), list(
         null_percentages.values), color='blue')
     plt.title(title)
@@ -34,7 +35,7 @@ def create_barplot_null_values(null_percentages, title, y_label, x_label, show_p
     plt.clf()
 
 
-def create_barplot_null_values(null_percentages, title, y_label, x_label, show_plot:bool=True):
+def create_barplot_null_values(null_percentages, title, y_label, x_label, show_plot: bool = True):
 
     plt.bar(list(null_percentages.index), list(
         null_percentages.values), color='blue')
@@ -46,10 +47,9 @@ def create_barplot_null_values(null_percentages, title, y_label, x_label, show_p
     if show_plot:
         plt.show()
     plt.clf()
-    
 
 
-def create_barplot_year(df: DataFrame, column: str, title: str, y_label: str, x_label: str, show_plot:bool=True) -> None:
+def create_barplot_year(df: DataFrame, column: str, title: str, y_label: str, x_label: str, show_plot: bool = True) -> None:
     df_yb = df
     df_yb[column] = df_yb[column].replace(np.nan, -1, inplace=False)
     df_yb_grouped = df_yb.groupby(column)[column].count()
@@ -66,7 +66,7 @@ def create_barplot_year(df: DataFrame, column: str, title: str, y_label: str, x_
     plt.clf()
 
 
-def create_scatterplot_price(df: DataFrame, column: str, title: str, x_label: str, y_label: str, show_plot:bool=True):
+def create_scatterplot_price(df: DataFrame, column: str, title: str, x_label: str, y_label: str, show_plot: bool = True):
     plt.scatter(list(df.index), df[column],
                 color='blue', marker='o', alpha=0.1)
     plt.title(title)
@@ -94,9 +94,6 @@ def calculate_null_ratios(df: DataFrame):
     return df_is_null / df.shape[0] * 100
 
 
-
-
-
 def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300):
 
     path = config.IMAGES_PATH / f"{fig_id}.{fig_extension}"
@@ -104,20 +101,43 @@ def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)
 
-def visualize_regression(x_test:DataFrame, y_test:DataFrame)->None:
-    # plt.plot(x, y_predict, "r-", label="Regression")
-    plt.plot(x_test, y_test, "b.")
 
-    # extra code – beautifies and saves Figure 4–2
-    plt.xlabel("$x_1$")
-    plt.ylabel("$y$", rotation=0)
-    plt.axis([0, 2, 0, 15])
-    plt.grid()
-    plt.legend(loc="upper left")
-    save_fig("linear_model_predictions_plot")
+def visualize_sdg_regressor(y: DataFrame, X: DataFrame, model: SGDRegressor, column_name: str):
+    X_area = X[[column_name]].values  # Convert to numpy array
+    y_price = y.values
 
-    return None
-    
+
+    # Calculate the mean of each feature
+    means = X.mean().values
+
+    # Create a new dataset where each column has its mean, except for the column we vary
+    X_modified = np.tile(means, (X_area.shape[0], 1))
+    X_modified[:, X.columns.get_loc(column_name)] = X_area.flatten()
+
+
+
+    # # Prepare a new dataset where 'area' varies and other features are set to their mean
+    # X_modified = np.zeros((X_area.shape[0], X.shape[1]))
+    # X_modified[:, X.columns.get_loc(column_name)] = X_area.flatten()
+
+    # Predictions based on the new modified dataset
+    y_predicted = model.predict(X_modified)
+
+    # Scatterplot of the actual data
+    plt.scatter(X_area, y_price, color='blue', label='Actual Prices')
+
+    # Plot the prediction line
+    order = np.argsort(X_area.flatten())  # For a sorted prediction line
+    plt.plot(X_area[order], y_predicted[order],
+             color='red', label='Prediction')
+
+    plt.xlabel(column_name)
+    plt.ylabel('Price')
+    title = f'SGDRegressor Prediction Visualization on "{column_name}"'
+    plt.title(title)
+    plt.legend()
+    save_fig(plt, title )
+    plt.show()
 
     # # ## Visualize distribution of cellar, lift,
 
@@ -129,7 +149,7 @@ def visualize_regression(x_test:DataFrame, y_test:DataFrame)->None:
     # plt.xlabel("Asset")
     # plt.xticks([])
     # if show_plot:
-        # plt.show()
+    # plt.show()
 
     # # lift
     # plt.scatter( list(df.index), df['lift'], color='blue',marker='x', alpha=0.1)
@@ -138,7 +158,7 @@ def visualize_regression(x_test:DataFrame, y_test:DataFrame)->None:
     # plt.xlabel("Asset")
     # plt.xticks([])
     # if show_plot:
-        # plt.show()
+    # plt.show()
 
     # # ## check Rooms
 
@@ -151,7 +171,7 @@ def visualize_regression(x_test:DataFrame, y_test:DataFrame)->None:
     # plt.axis([0, 6, 0 , 7000])
     # plt.xticks([i for i in range(6)])
     # if show_plot:
-        # plt.show()
+    # plt.show()
 
     # #Mean price rooms
     # price_per_rooms = df.groupby('rooms')['price'].mean()
@@ -161,7 +181,7 @@ def visualize_regression(x_test:DataFrame, y_test:DataFrame)->None:
     # plt.xlabel("rooms")
     # plt.xticks([i for i in range(6)])
     # if show_plot:
-        # plt.show()
+    # plt.show()
 
     # # ## Construction type
     # import numpy as np
@@ -174,7 +194,7 @@ def visualize_regression(x_test:DataFrame, y_test:DataFrame)->None:
     # plt.xlabel("construction type" )
     # plt.xticks(rotation=45)
     # if show_plot:
-        # plt.show()
+    # plt.show()
 
     # construction_type_price = df.groupby('construction_type')['price'].mean().sort_values(ascending=False)
     # plt.bar( list(construction_type_price.index), list(construction_type_price.values), .5, color=plt.get_cmap('viridis')(np.linspace(0,1,construction_type_anmount.shape[0])))
@@ -183,4 +203,4 @@ def visualize_regression(x_test:DataFrame, y_test:DataFrame)->None:
     # plt.xlabel("construction type" )
     # plt.xticks(rotation=45)
     # if show_plot:
-        # plt.show()
+    # plt.show()

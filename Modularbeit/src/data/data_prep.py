@@ -38,7 +38,7 @@ def prep_data(df: DataFrame):
         map_values(binarized_df, 'certificate', certificates_mapper)
 
         logging.info("Export preprocessed data")
-        binarized_df.to_parquet(config.PREPROCESSED_DATA_PATH + '.parquet', index=False)
+        # binarized_df.to_parquet(config.PREPROCESSED_DATA_PATH + '.parquet', index=False)
         binarized_df.to_csv(config.PREPROCESSED_DATA_PATH + '.csv', index=False)
 
         return df

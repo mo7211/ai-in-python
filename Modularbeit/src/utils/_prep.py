@@ -14,17 +14,20 @@ import config
 
 
 def binarize_labels(df: DataFrame, columns: list[str]) -> None:
-    df_out = df
+    df_out = df.copy()
     for c in columns:
-        
+
         logging.info(f'Start binarizing column {c}')
         if df_out.columns.str.contains(c).any():
             names = df_out[c]
             config.FEATURE_MAPPER[c] = names.values.reshape(-1, 1)
 
             one_hot = LabelBinarizer()
-            df_out[c] = list(one_hot.fit_transform(config.FEATURE_MAPPER[c]))
-            df_out = expand_feature(df_out, c)
+            one_hot.fit_transform(config.FEATURE_MAPPER[c])
+            
+            new_columns = pd.get_dummies(
+                config.FEATURE_MAPPER[c][:, 0], dtype=float)
+            df_out = pd.concat([new_columns, df_out.drop(columns=[c])], axis=1)
 
     return df_out
 
@@ -47,7 +50,7 @@ def scale_minmax(df: DataFrame, columns: list[str]):
         if df_out.columns.str.contains(c).any():
             df_out[c] = minmax_scale.fit_transform(df[c].values.reshape(-1, 1))
             logging.info(f'Column {c} succesfully scaled')
-            
+
         else:
             logging.info(f'No column {c} in dataframe')
     return df_out
@@ -89,7 +92,8 @@ def expand_feature(df: DataFrame, column_name: str):
     features_expanded.columns = [f'{column_name}_{i}\
                                  ' for i in features_expanded.columns]
 
-    df_out = pd.concat([features_expanded, df.drop(columns=[column_name])], axis=1)
+    df_out = pd.concat(
+        [features_expanded, df.drop(columns=[column_name])], axis=1)
 
     return df_out
 

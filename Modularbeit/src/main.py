@@ -2,20 +2,25 @@
 
 import logging
 from matplotlib import pyplot as plt
+import numpy as np
 import pandas as pd
 
+
 from visualization import visualize_cleaning
-from utils import configurize_logger, save_fig
+from utils import configurize_logger, discretize_feature
 from data import clean_data, prep_data
 from models import *
 import config
+from config import ModellingMethods
 
 
 def main():
-    configurize_logger(__name__)
+    configurize_logger(config.METHOD.name)
     show_plots = config.SHOW_PLOTS
 
     logging.info('Start script')
+
+    # cleaning
 
     df = pd.read_csv(
         config.INPUT_DATA_PATH, sep=";")
@@ -29,36 +34,28 @@ def main():
 
     prep_data(cleaned_df)
 
-    config.TARGET = 'price'
+    # preprocessing
 
-    # preprocessed_df = pd.read_parquet(
-    #     config.PREPROCESSED_DATA_PATH + '.parquet')
     preprocessed_df = pd.read_csv(config.PREPROCESSED_DATA_PATH + '.csv')
 
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
 
-    # target data
-    y = preprocessed_df['price']
+    # modelling
+    if not config.TRAIN:
+        config.METHOD = None
+    config.METHOD = ModellingMethods.PolynomialRegression
 
-    # features
-    X = preprocessed_df.drop(columns=['price'])
+    config.TARGET = 'price'
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=config.TEST_SIZE, random_state=42)
+    y, X = define_target(preprocessed_df, config.TARGET)
 
-    sdg_regression(X_train, X_test, y_train, y_test)
+    n_bins = 1000
+    binned_y = discretize_feature(y, n_bins)
 
-    plt.figure(figsize=(6, 4))
-    plt.plot(X_test['area'], y_test, "b.")
-    plt.xlabel("$x_1$")
-    plt.ylabel("$y$", rotation=0)
-    # plt.axis([0, 2, 0, 15])
-    plt.grid()
-    save_fig(plt, "sdg_regression")
-    plt.show()
-
-    # regression(X_train, X_test, y_train, y_test)
+    train_regression(X, y)
+    # config.METHOD = ModellingMethods.DecisionTree
+    train_decision_tree(X, binned_y)
 
     logging.info('Script succesfully ended')
 

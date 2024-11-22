@@ -1,18 +1,41 @@
+from enum import Enum
 from pathlib import Path
 import time
+
+from sklearn.linear_model import SGDRegressor
 from utils._cleaning import SplitOption
 
-# Options
 
-CLEAN = True
-PREPROCESS = True
+class ModellingMethods(Enum):
+    SGDRegressor = 'SGDRegressor'
+    LinearRegression = 'LinearRegression'
+    PolynomialRegression = 'PolynomialRegression'
+    DecisionTree = 'DecisionTree'
+    RandomForrest = 'RandomForrest'
+    SVM = 'SVM'
+    kmeans = 'kmeans'
+    DBScan = 'DBScan'
+    NeuralNetwork = 'NeuralNetwork'
+
+
+class HyperparametersFitting(Enum):
+    On = True
+    Off = False
+
+
+# Options
+NAME = 'DecisionTree'
+
+CLEAN = False
+PREPROCESS = False
 TRAIN = True
-TRAIN_METHOD = "xx"
+
 
 SPLIT_OPTION = SplitOption.WITH_INDEX
 SHOW_PLOTS = False
 TARGET = ''
 TEST_SIZE = 0.3
+POLY_DEGREE = 2
 
 # Data
 
