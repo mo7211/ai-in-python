@@ -48,15 +48,13 @@ def poly_regression(X: pd.DataFrame, y: pd.Series, degrees:list[int]):
 
             logging.info(f'Hyperparameter method is {config.HYPERPARAM_METHOD.name}')
             if config.HYPERPARAM_METHOD == config.HyperparamMethods.RandomizedSearchCV:
-                logging.info('Fit hyperparameters with RandomizedSearchCV')
                 logging.info(f'Parameters are {config.POLY_REG_DISTRIBUTION_RANDOM}')
                 clf = RandomizedSearchCV(
-                    model, config.POLY_REG_DISTRIBUTION_RANDOM, random_state=0)
+                    model, config.POLY_REG_DISTRIBUTION_RANDOM, random_state=0, n_jobs=-1)
 
             elif config.HYPERPARAM_METHOD == config.HyperparamMethods.GridSearchCV:
-                logging.info('Fit hyperparameters with GridSearchCV')
                 logging.info(f'Parameters are {config.POLY_REG_DISTRIBUTION_GRID}')
-                clf = GridSearchCV(model, config.POLY_REG_DISTRIBUTION_GRID)
+                clf = GridSearchCV(model, config.POLY_REG_DISTRIBUTION_GRID, n_jobs=-1)
 
             with warnings.catch_warnings(record=True) as caught_warnings:
                 warnings.simplefilter("always", ConvergenceWarning)

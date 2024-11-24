@@ -8,7 +8,7 @@ import pandas as pd
 
 from visualization import visualize_cleaning
 from utils import configurize_logger, discretize_feature
-from data import clean_data, prep_data
+from data import clean_data, prep_data, reduce_dimensions
 from models import *
 import config
 from config import ModellingMethods
@@ -40,8 +40,10 @@ def main():
 
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
+    
 
-    # training
+
+    # split training and testing sets
     logging.info('Start training')
     config.TARGET = 'price'
 
@@ -49,6 +51,11 @@ def main():
 
     n_bins = 1000
     binned_y = discretize_feature(y, n_bins)
+
+    # reduce dimensions
+    reduced_df = reduce_dimensions(X)
+
+    # train
 
     train_regression(X, y)
     train_decision_tree(X, binned_y)

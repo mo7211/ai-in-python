@@ -34,22 +34,24 @@ NAME = 'DecisionTree'
 
 
 CLEAN = False
+VISUALIZE = False
 PREPROCESS = False
-MODEL_METHOD = ModellingMethods.PolynomialRegression
-HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
+REDUCE_DIMENSIONS = True
+MODEL_METHOD = ModellingMethods.NoTraining
+HYPERPARAM_METHOD = None
 
 SPLIT_OPTION = SplitOption.WITH_INDEX
 SHOW_PLOTS = False
 TARGET = 'price'
 TEST_SIZE = 0.3
-POLY_DEGREES = [1, 2, 3]
+POLY_DEGREES = [1, 2]
 
 # Hyperparameters
 
 POLY_REG_DISTRIBUTION_RANDOM = dict(tol=[1e-5], penalty=[None, 'l2', 'l1', 'elasticnet'], eta0=[
-    0.05, 0.01, 0.005])
+    0.5, 0.1, 0.05, 0.01])
 POLY_REG_DISTRIBUTION_GRID = dict(max_iter=[1000], tol=[
-                                  1e-5], penalty=[None], eta0=[0.01], n_iter_no_change=[100], random_state=[42])
+                                  1e-5], penalty=['elasticnet'], eta0=[0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09], n_iter_no_change=[100], random_state=[42])
 
 
 # Data
