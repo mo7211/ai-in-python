@@ -2,6 +2,7 @@ from pathlib import Path
 import time
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from pandas import DataFrame
 from sklearn.linear_model import SGDRegressor
 
@@ -101,6 +102,9 @@ def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)
 
+def visualize_model():
+    return True
+
 
 def visualize_sdg_regressor(y: DataFrame, X: DataFrame, model: SGDRegressor, column_name: str):
     X_area = X[[column_name]].values  # Convert to numpy array
@@ -139,6 +143,11 @@ def visualize_sdg_regressor(y: DataFrame, X: DataFrame, model: SGDRegressor, col
     save_fig(plt, title )
     plt.show()
 
+def create_pairplot(df:DataFrame):
+
+    g = pd.plotting.scatter_matrix(df, figsize=(10,10), marker = 'o', hist_kwds = {'bins': 10}, s = 60, alpha = 0.8)
+
+    plt.show()
     # # ## Visualize distribution of cellar, lift,
 
     # # cellar

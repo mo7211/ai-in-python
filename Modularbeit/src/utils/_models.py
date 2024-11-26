@@ -2,16 +2,18 @@ import logging
 import math
 import numpy as np
 from pandas import DataFrame
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import average_precision_score, mean_squared_error
 
 
-def log_mean_squared_error(model, X_test, y_test):
+def log_metrics(model, X_test, y_test):
     if model:
         y_pred = model.predict(X_test)
 
         mse = mean_squared_error(y_test, y_pred)
+        # aps = average_precision_score(y_test, y_pred)
 
         logging.info(f'mean squared error is: {mse}')
+        # logging.info(f'average precision score is: {aps}')
         return mse
     else:
         return None

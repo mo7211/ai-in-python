@@ -1,13 +1,11 @@
 # coding: utf-8
 
 import logging
-from matplotlib import pyplot as plt
-import numpy as np
 import pandas as pd
 
 
-from visualization import visualize_cleaning
-from utils import configurize_logger, discretize_feature
+from visualization import visualize_cleaning, create_pairplot
+from utils import configurize_logger, visualize_model
 from data import clean_data, prep_data
 from models import *
 import config
@@ -15,7 +13,7 @@ from config import ModellingMethods
 
 
 def main():
-    configurize_logger(config.METHOD.name)
+    configurize_logger(config.MODEL_METHOD.name)
     show_plots = config.SHOW_PLOTS
 
     logging.info('Start script')
@@ -26,10 +24,13 @@ def main():
         config.INPUT_DATA_PATH, sep=";")
 
     visualize_cleaning(df, "before cleaning", show_plots)
-    clean_data(df, config.SPLIT_OPTION)
+    cleaned_df = clean_data(df, config.SPLIT_OPTION)
 
     cleaned_df = pd.read_csv(
         config.SPLITTED_DATA_PATH)
+    
+    # To-do refine pairplot
+    # create_pairplot(cleaned_df)
     visualize_cleaning(cleaned_df, "after cleaning", show_plots)
 
     prep_data(cleaned_df)
@@ -41,21 +42,16 @@ def main():
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
 
-    # modelling
-    if not config.TRAIN:
-        config.METHOD = None
-    config.METHOD = ModellingMethods.PolynomialRegression
-
+    # split training and testing sets
+    logging.info('Start training')
     config.TARGET = 'price'
 
     y, X = define_target(preprocessed_df, config.TARGET)
 
-    n_bins = 1000
-    binned_y = discretize_feature(y, n_bins)
+    # train
+    train_model(X, y, config.PIPELINE, config.PARAMETERS, config.TEST_SIZE)
 
-    train_regression(X, y)
-    # config.METHOD = ModellingMethods.DecisionTree
-    train_decision_tree(X, binned_y)
+    visualize_model()
 
     logging.info('Script succesfully ended')
 
