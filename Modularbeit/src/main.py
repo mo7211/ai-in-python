@@ -1,21 +1,19 @@
 # coding: utf-8
 
 import logging
-from matplotlib import pyplot as plt
-import numpy as np
 import pandas as pd
 
 
-from visualization import visualize_cleaning
-from utils import configurize_logger, discretize_feature
-from data import clean_data, prep_data, reduce_dimensions
+from visualization import visualize_cleaning, create_pairplot
+from utils import configurize_logger, visualize_model
+from data import clean_data, prep_data
 from models import *
 import config
 from config import ModellingMethods
 
 
 def main():
-    configurize_logger('Run')
+    configurize_logger(config.MODEL_METHOD.name)
     show_plots = config.SHOW_PLOTS
 
     logging.info('Start script')
@@ -26,10 +24,13 @@ def main():
         config.INPUT_DATA_PATH, sep=";")
 
     visualize_cleaning(df, "before cleaning", show_plots)
-    clean_data(df, config.SPLIT_OPTION)
+    cleaned_df = clean_data(df, config.SPLIT_OPTION)
 
     cleaned_df = pd.read_csv(
         config.SPLITTED_DATA_PATH)
+    
+    # To-do refine pairplot
+    # create_pairplot(cleaned_df)
     visualize_cleaning(cleaned_df, "after cleaning", show_plots)
 
     prep_data(cleaned_df)
@@ -49,6 +50,8 @@ def main():
 
     # train
     train_model(X, y, config.PIPELINE, config.PARAMETERS, config.TEST_SIZE)
+
+    visualize_model()
 
     logging.info('Script succesfully ended')
 
