@@ -6,8 +6,9 @@ from sklearn.decomposition import PCA
 import config
 
 
-def reduce_dimensions(df:DataFrame, n_components:float=0.95):
-    if config.REDUCE_DIMENSIONS:
+def reduce_dimensions(df:DataFrame, reduce = True, n_components:float=0.95):
+    
+    if reduce:
         logging.info('Reducing dimensions')
         n_columns_old = df.columns.size
 

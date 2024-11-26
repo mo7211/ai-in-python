@@ -15,7 +15,7 @@ from config import ModellingMethods
 
 
 def main():
-    configurize_logger(config.MODEL_METHOD.name)
+    configurize_logger('Run')
     show_plots = config.SHOW_PLOTS
 
     logging.info('Start script')
@@ -40,8 +40,6 @@ def main():
 
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
-    
-
 
     # split training and testing sets
     logging.info('Start training')
@@ -49,16 +47,8 @@ def main():
 
     y, X = define_target(preprocessed_df, config.TARGET)
 
-    n_bins = 1000
-    binned_y = discretize_feature(y, n_bins)
-
-    # reduce dimensions
-    reduced_df = reduce_dimensions(X)
-
     # train
-
-    train_regression(X, y)
-    train_decision_tree(X, binned_y)
+    train_model(X, y, config.PIPELINE, config.PARAMETERS, config.TEST_SIZE)
 
     logging.info('Script succesfully ended')
 
