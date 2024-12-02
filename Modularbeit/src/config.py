@@ -24,7 +24,6 @@ class ModellingMethods(Enum):
     mini_batch_kmeans = 7
     kmeans = 8
     dbscan = 9
-    pca = 10
 
     training_off = False
 
@@ -39,9 +38,9 @@ class HyperparamMethods(Enum):
 CLEAN = True
 VISUALIZE = False
 PREPROCESS = False
-REDUCE_DIMENSIONS = True
-HYPERPARAM_METHOD = HyperparamMethods.GridSearchCV
-MODEL_METHOD = ModellingMethods.pca
+REDUCE_DIMENSIONS = False
+HYPERPARAM_METHOD = HyperparamMethods.parameter_search_off
+MODEL_METHOD = ModellingMethods.training_off
 PIPELINE = None
 PARAMETERS = None
 
