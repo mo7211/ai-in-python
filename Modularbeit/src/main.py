@@ -3,10 +3,9 @@
 import logging
 import pandas as pd
 
-
-from visualization import visualize_cleaning, create_pairplot
-from utils import configurize_logger, visualize_model
-from data import clean_data, prep_data
+from visualization import visualize_cleaning, create_pairplot, create_heatmap, create_tree_plot
+from utils import configurize_logger, visualize_model, define_target, log_df_shape
+from data import clean_data, prep_data, reduce_dimensions
 from models import *
 import config
 from config import ModellingMethods
@@ -28,25 +27,33 @@ def main():
 
     cleaned_df = pd.read_csv(
         config.SPLITTED_DATA_PATH)
-    
+
     # To-do refine pairplot
     # create_pairplot(cleaned_df)
+    # To-do refine heatmap
+    # TypeError: Image data of dtype object cannot be converted to float
+    # create_heatmap(cleaned_df)
+
     visualize_cleaning(cleaned_df, "after cleaning", show_plots)
 
-    prep_data(cleaned_df)
-
     # preprocessing
+
+    preprocessed_df = prep_data(cleaned_df)
 
     preprocessed_df = pd.read_csv(config.PREPROCESSED_DATA_PATH + '.csv')
 
     visualize_cleaning(
         preprocessed_df, "after preprocessing", show_plots)
 
-    # split training and testing sets
+    # define target
     logging.info('Start training')
     config.TARGET = 'price'
 
     y, X = define_target(preprocessed_df, config.TARGET)
+
+    # reduce dimensions
+
+    reduce_dimensions(X, config.REDUCE_DIMENSIONS)
 
     # train
     train_model(X, y, config.PIPELINE, config.PARAMETERS, config.TEST_SIZE)

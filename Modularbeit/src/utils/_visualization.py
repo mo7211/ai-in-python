@@ -1,9 +1,12 @@
 from pathlib import Path
 import time
+from IPython.display import Image
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from pandas import DataFrame
+import pydotplus
+from sklearn import tree
 from sklearn.linear_model import SGDRegressor
 
 import config
@@ -102,6 +105,7 @@ def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)
 
+
 def visualize_model():
     return True
 
@@ -110,15 +114,12 @@ def visualize_sdg_regressor(y: DataFrame, X: DataFrame, model: SGDRegressor, col
     X_area = X[[column_name]].values  # Convert to numpy array
     y_price = y.values
 
-
     # Calculate the mean of each feature
     means = X.mean().values
 
     # Create a new dataset where each column has its mean, except for the column we vary
     X_modified = np.tile(means, (X_area.shape[0], 1))
     X_modified[:, X.columns.get_loc(column_name)] = X_area.flatten()
-
-
 
     # # Prepare a new dataset where 'area' varies and other features are set to their mean
     # X_modified = np.zeros((X_area.shape[0], X.shape[1]))
@@ -140,16 +141,126 @@ def visualize_sdg_regressor(y: DataFrame, X: DataFrame, model: SGDRegressor, col
     title = f'SGDRegressor Prediction Visualization on "{column_name}"'
     plt.title(title)
     plt.legend()
-    save_fig(plt, title )
+    save_fig(plt, title)
     plt.show()
 
-def create_pairplot(df:DataFrame):
 
-    g = pd.plotting.scatter_matrix(df, figsize=(10,10), marker = 'o', hist_kwds = {'bins': 10}, s = 60, alpha = 0.8)
+def create_pairplot(df: DataFrame):
 
+    g = pd.plotting.scatter_matrix(df, figsize=(10, 10), marker='.', hist_kwds={
+                                   'bins': 10}, s=60, alpha=0.8, range_padding=0.1)
+    for ax in g[:, 0]:  # Iterate over the first column of subplot axes
+        ax.yaxis.label.set_rotation(0)
+        ax.yaxis.label.set_ha('right')
+    plt.show()
+
+
+def create_heatmap(df: DataFrame):
+    # Create a heatmap
+    plt.imshow(df, cmap='hot', interpolation='nearest')
+
+    # Add a color bar
+    plt.colorbar()
+
+    # Show the plot
+    plt.show()
+
+
+def create_tree_plot(pipeline, X):
+    decision_tree = pipeline.named_steps['tree']
+
+    # Plot the decision tree
+    plt.figure(figsize=(20, 10))
+    tree.plot_tree(decision_tree, feature_names=X.columns, filled=True)
+    plt.show()
+
+
+def plot_pca_explained_variance(pca):
+    cumsum = np.cumsum(pca.explained_variance_ratio_)
+    d = np.argmax(cumsum >= 0.95) + 1  # d equals 154#
+
+    plt.figure(figsize=(6, 4))
+    plt.plot(cumsum, linewidth=3)
+    plt.axis([0, 170, 0, 1])
+    plt.xlabel("Dimensions")
+    plt.ylabel("Explained Variance")
+    plt.plot([d, d], [0, 0.95], "k:")
+    plt.plot([0, d], [0.95, 0.95], "k:")
+    plt.plot(d, 0.95, "ko")
+    plt.annotate("Elbow", xy=(26, 0.95), xytext=(70, 0.7),
+                 arrowprops=dict(arrowstyle="->"))
+    plt.grid(True)
+    title = "explained_variance_plot"
+    save_fig(plt, title)
     plt.show()
     # # ## Visualize distribution of cellar, lift,
 
+
+def plot_pca_best_projection(df: DataFrame):
+
+    np.random.seed(3)
+    X_line = df.values
+    m = X_line.shape[0]
+
+    angle = np.pi / 5
+
+    u1 = np.array([np.cos(angle), np.sin(angle)])
+    u2 = np.array([np.cos(angle - 2 * np.pi / 6),
+                  np.sin(angle - 2 * np.pi / 6)])
+    u3 = np.array([np.cos(angle - np.pi / 2), np.sin(angle - np.pi / 2)])
+
+    X_proj1 = X_line @ u1.reshape(-1, 1)
+    X_proj2 = X_line @ u2.reshape(-1, 1)
+    X_proj3 = X_line @ u3.reshape(-1, 1)
+
+    plt.figure(figsize=(8, 4))
+    plt.subplot2grid((3, 2), (0, 0), rowspan=3)
+    plt.plot([-1.4, 1.4], [-1.4 * u1[1] / u1[0], 1.4 * u1[1] / u1[0]], "k-",
+             linewidth=2)
+    plt.plot([-1.4, 1.4], [-1.4 * u2[1] / u2[0], 1.4 * u2[1] / u2[0]], "k--",
+             linewidth=2)
+    plt.plot([-1.4, 1.4], [-1.4 * u3[1] / u3[0], 1.4 * u3[1] / u3[0]], "k:",
+             linewidth=2)
+    plt.plot(X_line[:, 0], X_line[:, 1], "ro", alpha=0.5)
+    plt.arrow(0, 0, u1[0], u1[1], head_width=0.1, linewidth=4, alpha=0.9,
+              length_includes_head=True, head_length=0.1, fc="b", ec="b", zorder=10)
+    plt.arrow(0, 0, u3[0], u3[1], head_width=0.1, linewidth=1, alpha=0.9,
+              length_includes_head=True, head_length=0.1, fc="b", ec="b", zorder=10)
+    plt.text(u1[0] + 0.1, u1[1] - 0.05, r"$\mathbf{c_1}$", color="blue")
+    plt.text(u3[0] + 0.1, u3[1], r"$\mathbf{c_2}$", color="blue")
+    plt.xlabel("$x_1$")
+    plt.ylabel("$x_2$", rotation=0)
+    # plt.axis([-1.4, 1.4, -1.4, 1.4])
+    plt.grid()
+
+    plt.subplot2grid((3, 2), (0, 1))
+    plt.plot([-2, 2], [0, 0], "k-", linewidth=2)
+    plt.plot(X_proj1[:, 0], np.zeros(m), "ro", alpha=0.3)
+    plt.gca().get_yaxis().set_ticks([])
+    plt.gca().get_xaxis().set_ticklabels([])
+    # plt.axis([-2, 2, -1, 1])
+    plt.grid()
+
+    plt.subplot2grid((3, 2), (1, 1))
+    plt.plot([-2, 2], [0, 0], "k--", linewidth=2)
+    plt.plot(X_proj2[:, 0], np.zeros(m), "ro", alpha=0.3)
+    plt.gca().get_yaxis().set_ticks([])
+    plt.gca().get_xaxis().set_ticklabels([])
+    # plt.axis([-2, 2, -1, 1])
+    plt.grid()
+
+    plt.subplot2grid((3, 2), (2, 1))
+    plt.plot([-2, 2], [0, 0], "k:", linewidth=2)
+    plt.plot(X_proj3[:, 0], np.zeros(m), "ro", alpha=0.3)
+    plt.gca().get_yaxis().set_ticks([])
+    # plt.axis([-2, 2, -1, 1])
+    plt.xlabel("$z_1$")
+    plt.grid()
+
+    save_fig(plt, "pca_best_projection_plot")
+    plt.show()
+
+    
     # # cellar
 
     # plt.scatter( list(df.index), df['cellar'], color='blue',marker='x', alpha=0.1)
