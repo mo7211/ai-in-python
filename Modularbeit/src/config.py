@@ -2,6 +2,7 @@ from enum import Enum
 from pathlib import Path
 import time
 
+from sklearn.cluster import MiniBatchKMeans
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
@@ -20,6 +21,10 @@ class ModellingMethods(Enum):
     pca_scaler_svr = 4
     scaler_svr = 5
     decision_tree = 6
+    mini_batch_kmeans = 7
+    kmeans = 8
+    dbscan = 9
+    pca = 10
 
     training_off = False
 
@@ -31,12 +36,14 @@ class HyperparamMethods(Enum):
 
 
 # Options
-CLEAN = False
+CLEAN = True
 VISUALIZE = False
 PREPROCESS = False
 REDUCE_DIMENSIONS = True
-HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
-MODEL_METHOD = ModellingMethods.decision_tree
+HYPERPARAM_METHOD = HyperparamMethods.GridSearchCV
+MODEL_METHOD = ModellingMethods.pca
+PIPELINE = None
+PARAMETERS = None
 
 # Regression + dim reduction
 if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
@@ -52,8 +59,7 @@ if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
                       }
     elif MODEL_METHOD == ModellingMethods.decision_tree:
         # Decision tree + dim reduction
-        PIPELINE = Pipeline([
-                            ('tree', DecisionTreeRegressor(random_state=0))])
+        PIPELINE = Pipeline([('tree', DecisionTreeRegressor(random_state=0))])
         PARAMETERS = {
             'tree__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None]
         }
@@ -92,7 +98,19 @@ if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
                                       'poly', 'rbf'],
                       'svr__gamma': [1]
                       }
-
+    elif MODEL_METHOD == ModellingMethods.mini_batch_kmeans:
+        # Decision tree + dim reduction
+        PIPELINE = Pipeline([('scaler', StandardScaler()),
+                            ('minibatchkmeans', MiniBatchKMeans(random_state=0, batch_size=100))])
+        PARAMETERS = {
+            'minibatchkmeans__n_clusters': [2, 3, 4, 5, 6, 7, 8]
+        }
+    elif MODEL_METHOD == ModellingMethods.pca:
+        # Decision tree + dim reduction
+        PIPELINE = Pipeline([('pca', PCA())])
+        PARAMETERS = {
+            'pca__n_components': [0.95]
+        }
 
 SPLIT_OPTION = SplitOption.WITH_INDEX
 SHOW_PLOTS = False

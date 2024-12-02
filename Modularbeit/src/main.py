@@ -3,8 +3,7 @@
 import logging
 import pandas as pd
 
-
-from visualization import visualize_cleaning, create_pairplot, create_heatmap
+from visualization import visualize_cleaning, create_pairplot, create_heatmap, create_tree_plot
 from utils import configurize_logger, visualize_model
 from data import clean_data, prep_data
 from models import *
@@ -31,13 +30,13 @@ def main():
 
     # To-do refine pairplot
     # create_pairplot(cleaned_df)
-
     # To-do refine heatmap
     # TypeError: Image data of dtype object cannot be converted to float
     # create_heatmap(cleaned_df)
+    
     visualize_cleaning(cleaned_df, "after cleaning", show_plots)
 
-    prep_data(cleaned_df)
+    preprocessed_df = prep_data(cleaned_df)
 
     # preprocessing
 
