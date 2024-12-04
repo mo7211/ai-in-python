@@ -7,6 +7,7 @@ import pandas as pd
 from pandas import DataFrame
 import pydotplus
 from sklearn import tree
+from sklearn.base import BaseEstimator
 from sklearn.linear_model import SGDRegressor
 
 import config
@@ -258,6 +259,32 @@ def plot_pca_best_projection(df: DataFrame):
     plt.grid()
 
     save_fig(plt, "pca_best_projection_plot")
+    plt.show()
+
+
+def plot_feature_importance(model: BaseEstimator, X: DataFrame):
+    # feature importance calculation
+    importances = model.feature_importances_
+
+    # Sort feature importance with decreasing values
+    indices = np.argsort(importances)[::-1]
+
+    # Sort feature names according to feature importance
+    names = [X.columns[i] for i in indices]
+
+    # generate the diagram
+    plt.figure()
+
+    # generate the diagram title
+    plt.title("Feature importance")
+
+    # add bars
+    plt.bar(range(X.shape[1]), importances[indices])
+
+    # feature name as name on the x-axis
+    plt.xticks(range(X.shape[1]), names, rotation=90)
+
+    # show diagram
     plt.show()
 
     # # cellar
