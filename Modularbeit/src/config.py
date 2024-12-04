@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 import time
 
-from sklearn.cluster import MiniBatchKMeans
+from sklearn.cluster import DBSCAN, MiniBatchKMeans
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
@@ -35,12 +35,12 @@ class HyperparamMethods(Enum):
 
 
 # Options
-CLEAN = True
+CLEAN = False
 VISUALIZE = False
 PREPROCESS = False
 REDUCE_DIMENSIONS = False
-HYPERPARAM_METHOD = HyperparamMethods.parameter_search_off
-MODEL_METHOD = ModellingMethods.training_off
+HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
+MODEL_METHOD = ModellingMethods.mini_batch_kmeans
 PIPELINE = None
 PARAMETERS = None
 
@@ -104,6 +104,13 @@ if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
         PARAMETERS = {
             'minibatchkmeans__n_clusters': [2, 3, 4, 5, 6, 7, 8]
         }
+    elif MODEL_METHOD == ModellingMethods.dbscan:
+        # Decision tree + dim reduction
+        PIPELINE = Pipeline([('scaler', StandardScaler()),
+                            ('dbscan', DBSCAN(n_jobs=-1))])
+        PARAMETERS = {
+            'minibatchkmeans__n_clusters': [2, 3, 4, 5, 6, 7, 8]
+        }
     elif MODEL_METHOD == ModellingMethods.pca:
         # Decision tree + dim reduction
         PIPELINE = Pipeline([('pca', PCA())])
@@ -113,7 +120,8 @@ if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
 
 SPLIT_OPTION = SplitOption.WITH_INDEX
 SHOW_PLOTS = False
-TARGET = 'price'
+TARGET = 'condition'#'price'
+BINARIZE = False
 TEST_SIZE = 0.3
 
 # Hyperparameters

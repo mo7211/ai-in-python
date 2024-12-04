@@ -166,7 +166,7 @@ def create_heatmap(df: DataFrame):
     plt.show()
 
 
-def create_tree_plot(pipeline, X):
+def plot_tree(pipeline, X):
     decision_tree = pipeline.named_steps['tree']
 
     # Plot the decision tree
@@ -260,7 +260,6 @@ def plot_pca_best_projection(df: DataFrame):
     save_fig(plt, "pca_best_projection_plot")
     plt.show()
 
-    
     # # cellar
 
     # plt.scatter( list(df.index), df['cellar'], color='blue',marker='x', alpha=0.1)
