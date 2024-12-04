@@ -12,7 +12,7 @@ from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
 
 
-from utils._visualization import create_tree_plot
+from utils._visualization import plot_tree
 import config
 from utils._logging import LogExecutionTime
 from utils._models import log_metrics
@@ -25,6 +25,7 @@ def train_model(X: pd.DataFrame, y: pd.Series, pipeline: Pipeline, parameters: d
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=test_size, random_state=42)
+
     try:
         logging.info(f'Hyperparameter method is {
                      config.HYPERPARAM_METHOD.name}')
@@ -50,13 +51,7 @@ def train_model(X: pd.DataFrame, y: pd.Series, pipeline: Pipeline, parameters: d
 
         model = search.best_estimator_
 
-        # create_tree_plot(model, X_train)
-
-        log_metrics(model, X_test, y_test)
-
         return model
     except Exception as e:
         logging.error(f'An error occurred: {e}')
         return None
-
-

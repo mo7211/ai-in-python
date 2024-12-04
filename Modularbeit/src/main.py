@@ -3,8 +3,8 @@
 import logging
 import pandas as pd
 
-from visualization import visualize_cleaning, create_pairplot, create_heatmap, create_tree_plot
-from utils import configurize_logger, visualize_model, define_target, log_df_shape
+from visualization import visualize_cleaning, create_pairplot, create_heatmap, plot_tree
+from utils import configurize_logger, visualize_model, define_target, log_df_shape, measure_model
 from data import clean_data, prep_data, reduce_dimensions
 from models import *
 import config
@@ -47,7 +47,6 @@ def main():
 
     # define target
     logging.info('Start training')
-    config.TARGET = 'price'
 
     y, X = define_target(preprocessed_df, config.TARGET)
 
@@ -59,6 +58,8 @@ def main():
     train_model(X, y, config.PIPELINE, config.PARAMETERS, config.TEST_SIZE)
 
     visualize_model()
+
+    measure_model()
 
     logging.info('Script succesfully ended')
 
