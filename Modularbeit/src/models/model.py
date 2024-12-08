@@ -20,11 +20,8 @@ from utils._hyperparams import create_hyperparam_model
 
 
 @LogExecutionTime
-def train_model(X: pd.DataFrame, y: pd.Series, pipeline: Pipeline, parameters: dict, test_size: float):
+def train_model(X_train: pd.DataFrame, y_train: pd.Series, pipeline: Pipeline, parameters: dict):
     logging.info('Training model started')
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=42)
 
     try:
         logging.info(f'Hyperparameter method is {
