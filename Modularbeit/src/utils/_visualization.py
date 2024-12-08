@@ -9,12 +9,14 @@ import pydotplus
 from sklearn import tree
 from sklearn.base import BaseEstimator
 from sklearn.linear_model import SGDRegressor
+import seaborn as sns
+from scipy.stats import norm
 
 import config
 from utils._logging import get_time
 
 
-def create_scatterplot(df, column_name, title, y_label, x_label, x_ticks, show_plot: bool = True):
+def plot_scatterplot(df, column_name, title, y_label, x_label, x_ticks, show_plot: bool = True):
     plt.scatter(list(df.index), df[column_name],
                 color='blue', marker='x', alpha=0.1)
     plt.title(title)
@@ -27,7 +29,7 @@ def create_scatterplot(df, column_name, title, y_label, x_label, x_ticks, show_p
     plt.clf()
 
 
-def create_barplot_null_values(null_percentages, title, y_label, x_label, show_plot: bool = True):
+def plot_barplot_null_values(null_percentages, title, y_label, x_label, show_plot: bool = True):
     plt.bar(list(null_percentages.index), list(
         null_percentages.values), color='blue')
     plt.title(title)
@@ -40,7 +42,7 @@ def create_barplot_null_values(null_percentages, title, y_label, x_label, show_p
     plt.clf()
 
 
-def create_barplot_null_values(null_percentages, title, y_label, x_label, show_plot: bool = True):
+def plot_barplot_null_values(null_percentages, title, y_label, x_label, show_plot: bool = True):
 
     plt.bar(list(null_percentages.index), list(
         null_percentages.values), color='blue')
@@ -54,7 +56,7 @@ def create_barplot_null_values(null_percentages, title, y_label, x_label, show_p
     plt.clf()
 
 
-def create_barplot_year(df: DataFrame, column: str, title: str, y_label: str, x_label: str, show_plot: bool = True) -> None:
+def plot_barplot_year(df: DataFrame, column: str, title: str, y_label: str, x_label: str, show_plot: bool = True) -> None:
     df_yb = df
     df_yb[column] = df_yb[column].replace(np.nan, -1, inplace=False)
     df_yb_grouped = df_yb.groupby(column)[column].count()
@@ -71,7 +73,7 @@ def create_barplot_year(df: DataFrame, column: str, title: str, y_label: str, x_
     plt.clf()
 
 
-def create_scatterplot_price(df: DataFrame, column: str, title: str, x_label: str, y_label: str, show_plot: bool = True):
+def plot_scatterplot_price(df: DataFrame, column: str, title: str, x_label: str, y_label: str, show_plot: bool = True):
     plt.scatter(list(df.index), df[column],
                 color='blue', marker='o', alpha=0.1)
     plt.title(title)
@@ -107,8 +109,44 @@ def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300
     plt.savefig(path, format=fig_extension, dpi=resolution)
 
 
-def visualize_model():
-    return True
+def plot_pairplot(df: DataFrame, target: str):
+    sns.pairplot(df, hue=target)
+    title = 'pairplot_' + target
+    save_fig(plt, title)
+    # plt.show()
+    plt.clf()
+
+
+def plot_distribution(df: DataFrame, target_column: str, suffix: str = ''):
+    # Extract 'price' data
+    target = df[target_column].copy().dropna()
+
+    # Plot histogram
+    plt.figure(figsize=(10, 6))
+    count, bins, ignored = plt.hist(
+        target, bins=30, density=True, color='blue', alpha=0.7)
+
+    # Fit a normal distribution to the data and plot
+    mu, std = norm.fit(target)
+    xmin, xmax = plt.xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = norm.pdf(x, mu, std)
+
+    plt.plot(x, p, 'k', linewidth=2)
+
+    label = target_column.capitalize()
+
+    # Add a title and labels
+    title = f'Distribution of {label}'
+    plt.title(title)
+    plt.xlabel(label)
+    plt.ylabel('Density')
+
+    save_fig(plt, title + suffix)
+
+    # Show plot
+    # plt.show()
+    plt.clf()
 
 
 def visualize_sdg_regressor(y: DataFrame, X: DataFrame, model: SGDRegressor, column_name: str):
@@ -154,6 +192,7 @@ def create_pairplot(df: DataFrame):
         ax.yaxis.label.set_rotation(0)
         ax.yaxis.label.set_ha('right')
     plt.show()
+    plt.clf()
 
 
 def create_heatmap(df: DataFrame):
@@ -165,6 +204,7 @@ def create_heatmap(df: DataFrame):
 
     # Show the plot
     plt.show()
+    plt.clf()
 
 
 def plot_tree(pipeline, X):
@@ -173,7 +213,8 @@ def plot_tree(pipeline, X):
     # Plot the decision tree
     plt.figure(figsize=(20, 10))
     tree.plot_tree(decision_tree, feature_names=X.columns, filled=True)
-    plt.show()
+    save_fig(plt, 'Tree')
+    plt.clf()
 
 
 def plot_pca_explained_variance(pca):
@@ -195,6 +236,7 @@ def plot_pca_explained_variance(pca):
     save_fig(plt, title)
     plt.show()
     # # ## Visualize distribution of cellar, lift,
+    plt.clf()
 
 
 def plot_pca_best_projection(df: DataFrame):
@@ -260,6 +302,7 @@ def plot_pca_best_projection(df: DataFrame):
 
     save_fig(plt, "pca_best_projection_plot")
     plt.show()
+    plt.clf()
 
 
 def plot_feature_importance(model: BaseEstimator, X: DataFrame):
@@ -286,6 +329,7 @@ def plot_feature_importance(model: BaseEstimator, X: DataFrame):
 
     # show diagram
     plt.show()
+    plt.clf()
 
     # # cellar
 

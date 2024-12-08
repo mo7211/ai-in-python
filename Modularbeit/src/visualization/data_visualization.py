@@ -6,7 +6,7 @@ import logging
 from utils import *
 
 
-def visualize_cleaning(df: DataFrame, title: str = '', show_plots:bool = True):
+def visualize_cleaning(df: DataFrame, title: str = '', show_plots: bool = True):
     if df is not None and config.VISUALIZE:
         title = ' ' + title if len(title) > 0 else ''
         # Visualization before cleaning
@@ -14,18 +14,21 @@ def visualize_cleaning(df: DataFrame, title: str = '', show_plots:bool = True):
 
         # Visualize null ratios
         null_ratios = calculate_null_ratios(df)
-        create_barplot_null_values(
+        plot_barplot_null_values(
             null_ratios, "Percentage of null values" + title, "Null values in %", "Columns", show_plots)
 
         # Visualize floors of assets
-        create_scatterplot(
+        plot_scatterplot(
             df, 'floor', "Floor of asset" + title,  "# of floor", "Asset", [], show_plots)
 
         # Visualize year built
-        create_barplot_year(df, 'year_built' , "Year of construction" + title,
-                            "# of assets", "Year of construction", show_plots)
+        plot_barplot_year(df, 'year_built', "Year of construction" + title,
+                          "# of assets", "Year of construction", show_plots)
 
         # Visualize price
-        create_scatterplot_price(
+        plot_scatterplot_price(
             df, 'price', "Real estate prices" + title, "Asset", "Price in Euro", show_plots)
-    
+
+        plot_distribution(df, 'price', title)
+        plot_distribution(df, 'area', title)
+        plot_distribution(df, 'index', title)

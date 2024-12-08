@@ -21,9 +21,9 @@ class ModellingMethods(Enum):
     pca_scaler_svr = 4
     scaler_svr = 5
     decision_tree = 6
-    mini_batch_kmeans = 7
-    kmeans = 8
-    dbscan = 9
+    mini_batch_kmeans = 10
+    kmeans = 11
+    dbscan = 12
 
     training_off = False
 
@@ -35,14 +35,22 @@ class HyperparamMethods(Enum):
 
 
 # Options
-CLEAN = False
 VISUALIZE = False
+
+CLEAN = False
 PREPROCESS = False
 REDUCE_DIMENSIONS = False
+TRAINING = True
 HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
-MODEL_METHOD = ModellingMethods.mini_batch_kmeans
+MODEL_METHOD = ModellingMethods.pca_poly_regressor
+TARGET = 'price'  # 'condition'
 PIPELINE = None
 PARAMETERS = None
+
+if not TRAINING:
+    HYPERPARAM_METHOD = HyperparamMethods.parameter_search_off
+    MODEL_METHOD = ModellingMethods.training_off
+
 
 # Regression + dim reduction
 if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
@@ -120,7 +128,6 @@ if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
 
 SPLIT_OPTION = SplitOption.WITH_INDEX
 SHOW_PLOTS = False
-TARGET = 'condition'#'price'
 BINARIZE = False
 TEST_SIZE = 0.3
 
@@ -138,8 +145,7 @@ PREPROCESSED_DATA_PATH = 'Modularbeit/data/features/re_preprosessed_' + \
 
 # Paths
 
-IMAGES_PATH = Path('Modularbeit') / 'images' / \
-    (MODEL_METHOD.name + "_" + time.strftime("%Y-%m-%d_%H-%M-%S"))
+IMAGES_PATH = Path('Modularbeit') / 'images'
 IMAGES_PATH.mkdir(parents=True, exist_ok=True)
 LOGGING_PATH = 'Modularbeit/logging'
 

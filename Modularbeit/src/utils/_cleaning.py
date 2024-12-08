@@ -83,16 +83,21 @@ def clean_year_reconstructed(df: DataFrame):
 def clean_high_prices(df: DataFrame):
     rows_before = df.shape[0]
 
-    df.drop(df[df['price'] > 2000000].index, inplace=True)
+    df.drop(df[df['price'] > 800000].index, inplace=True)
 
     rows_after = df.shape[0]
     logging.info(str(rows_before - rows_after) + ' rows deleted.')
     return df
 
+
+def get_values_over(df, column, threshold):
+    return df[df[column] > threshold]
+
+
 def clean_big_area(df: DataFrame):
     rows_before = df.shape[0]
 
-    df.drop(df[df['area'] > 1000.0].index, inplace=True)
+    df.drop(df[df['area'] > 200.0].index, inplace=True)
 
     rows_after = df.shape[0]
     logging.info(str(rows_before - rows_after) + ' rows deleted.')
@@ -103,30 +108,31 @@ class SplitOption(Enum):
     WITH_INDEX = 'with_index'
     WITHOUT_INDEX = 'without_index'
 
-def split_dataframe(df:DataFrame, option: Union[SplitOption, str]) -> None:
+
+def split_dataframe(df: DataFrame, option: Union[SplitOption, str]) -> None:
     if isinstance(option, str):
         option = SplitOption(option)
 
     if option == SplitOption.WITH_INDEX:
         logging.info('splitting dataframe with index')
-        df_with_index = df.dropna(axis=0, how='any', subset=['quality_of_living', 'safety', 'transport', 'services', 'relax','environment'], inplace=False)
+        df_with_index = df.dropna(axis=0, how='any', subset=[
+                                  'quality_of_living', 'safety', 'transport', 'services', 'relax', 'environment'], inplace=False)
         return df_with_index
-    
+
     elif option == SplitOption.WITHOUT_INDEX:
         logging.info('splitting dataframe without index')
-        df_without_index = df.drop(['quality_of_living', 'safety', 'transport', 'services', 'relax','environment'], axis=1, inplace=False)
+        df_without_index = df.drop(['quality_of_living', 'safety', 'transport',
+                                   'services', 'relax', 'environment'], axis=1, inplace=False)
         return df_without_index
     else:
         raise ValueError("Ungültige Option ausgewählt.")
-    
-def convert_column_to_type(df:DataFrame, columns:list[str], type=float)-> None:
-    
+
+
+def convert_column_to_type(df: DataFrame, columns: list[str], type_=float) -> None:
+
     for c in columns:
-        logging.info(f'converting column {c} to {str(type)}')
-        if type == float:
-            df[c] = df[c].str.replace(',', '.').astype(type)
-        elif type == int:
-            df[c] = df[c].str.astype(type)
-
-
-
+        logging.info(f'converting column {c} to {str(type_)}')
+        if type_ == float:
+            df[c] = df[c].str.replace(',', '.').astype(type_)
+        elif type_ == int:
+            df[c] = df[c].astype(type_)

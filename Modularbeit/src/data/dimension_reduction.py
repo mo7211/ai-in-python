@@ -18,8 +18,8 @@ def reduce_dimensions(df: DataFrame, reduce=True, n_components: float = 0.95):
         # pca = PCA()
         df_reduced = pca.fit_transform(df)
 
-        plot_pca_explained_variance(pca)
-        plot_pca_best_projection(df[['area','year_built']])
+        # plot_pca_explained_variance(pca)
+        # plot_pca_best_projection(df[['area','year_built']])
 
         logging.info(f'Reduced from {n_columns_old} to {
                      pca.n_components_} components')

@@ -7,6 +7,7 @@ from utils._logging import LogExecutionTime
 
 from utils import *
 
+
 @LogExecutionTime
 def clean_data(df: DataFrame, split_option: SplitOption):
     if config.CLEAN:
@@ -24,7 +25,7 @@ def clean_data(df: DataFrame, split_option: SplitOption):
         drop_null_rows(cleaned_df, columns)
 
         columns_to_drop = ['orientation', 'energy_costs',
-                           'total_floors', 'balkonies', 'loggia', 'index', 'type']
+                           'total_floors', 'balkonies', 'loggia', 'type']
         drop_column(cleaned_df, columns_to_drop)
 
         clean_year_built(cleaned_df)
@@ -42,23 +43,25 @@ def clean_data(df: DataFrame, split_option: SplitOption):
 
         clean_rows_floor(cleaned_df)
 
-        # Clean types
-        columns_float = ['area',
-                         'environment',
-                         'quality_of_living',
-                         'safety',
-                         'transport',
-                         'services',
-                         'relax']
-        convert_column_to_type(cleaned_df, columns_float, float)
+        # # Clean types
+        # columns_float = ['price,'
+        #                  'area',
+        #                  'environment',
+        #                  'quality_of_living',
+        #                  'safety',
+        #                  'transport',
+        #                  'services',
+        #                  'index',
+        #                  'relax']
+        # convert_column_to_type(df, columns_float, float)
 
         clean_high_prices(cleaned_df)
         clean_big_area(cleaned_df)
 
         log_df_shape(cleaned_df)
 
-        # columns_int = ['rooms', 'year_built', 'year_reconstructed', 'floor']
-        # convert_column_to_type(cleaned_df, columns_int, int)
+    # columns_int = ['rooms', 'year_built', 'year_reconstructed', 'floor']
+    # convert_column_to_type(cleaned_df, columns_int, int)
 
         cleaned_df.to_csv(config.CLEANED_DATA_PATH, index=False)
 
