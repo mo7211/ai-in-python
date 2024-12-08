@@ -21,6 +21,7 @@ class ModellingMethods(Enum):
     pca_scaler_svr = 4
     scaler_svr = 5
     decision_tree = 6
+    pca_scaler_poly_regressor = 7
     mini_batch_kmeans = 10
     kmeans = 11
     dbscan = 12
@@ -42,7 +43,7 @@ PREPROCESS = False
 REDUCE_DIMENSIONS = False
 TRAINING = True
 HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
-MODEL_METHOD = ModellingMethods.pca_poly_regressor
+MODEL_METHOD = ModellingMethods.pca_scaler_poly_regressor
 TARGET = 'price'  # 'condition'
 PIPELINE = None
 PARAMETERS = None
@@ -56,6 +57,17 @@ if not TRAINING:
 if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
     if MODEL_METHOD == ModellingMethods.pca_poly_regressor:
         PIPELINE = Pipeline([('pca', PCA()),
+                            ('poly', PolynomialFeatures(include_bias=False)),
+                            ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))])
+        PARAMETERS = {'pca__n_components': [0.95],
+                      'poly__degree': [1, 2, 3],
+                      'regressor__max_iter': [1000, 2000, 3000],
+                      'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
+                      'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
+                      }
+    if MODEL_METHOD == ModellingMethods.pca_scaler_poly_regressor:
+        PIPELINE = Pipeline([('pca', PCA()),
+                             ('scaler', StandardScaler()),
                             ('poly', PolynomialFeatures(include_bias=False)),
                             ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))])
         PARAMETERS = {'pca__n_components': [0.95],
