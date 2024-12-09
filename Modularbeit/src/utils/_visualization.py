@@ -113,7 +113,7 @@ def plot_pairplot(df: DataFrame, target: str):
     sns.pairplot(df, hue=target)
     title = 'pairplot_' + target
     save_fig(plt, title)
-    # plt.show()
+    plt.show()
     plt.clf()
 
 

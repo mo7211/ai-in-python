@@ -22,9 +22,12 @@ class ModellingMethods(Enum):
     scaler_svr = 5
     decision_tree = 6
     pca_scaler_poly_regressor = 7
+
     mini_batch_kmeans = 10
     kmeans = 11
     dbscan = 12
+
+    pca = 99
 
     training_off = False
 
@@ -43,7 +46,7 @@ PREPROCESS = False
 REDUCE_DIMENSIONS = False
 TRAINING = True
 HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
-MODEL_METHOD = ModellingMethods.pca_scaler_poly_regressor
+MODEL_METHOD = ModellingMethods.pca_poly_regressor
 TARGET = 'price'  # 'condition'
 PIPELINE = None
 PARAMETERS = None

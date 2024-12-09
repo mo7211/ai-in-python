@@ -136,3 +136,19 @@ def convert_column_to_type(df: DataFrame, columns: list[str], type_=float) -> No
             df[c] = df[c].str.replace(',', '.').astype(type_)
         elif type_ == int:
             df[c] = df[c].astype(type_)
+
+def read_data(input_path, run: bool):
+    if run:
+        df = pd.read_csv(
+            input_path, sep=";")
+
+        columns_float = ['area',
+                         'environment',
+                         'quality_of_living',
+                         'safety',
+                         'transport',
+                         'services',
+                         'index',
+                         'relax']
+        convert_column_to_type(df, columns_float, float)
+        return df

@@ -5,8 +5,8 @@ from utils import *
 
 
 @LogExecutionTime
-def prep_data(df: DataFrame):
-    if config.PREPROCESS:
+def prep_data(df: DataFrame, run:bool):
+    if run:
         logging.info(50*"=")
         logging.info("Start data preprocessing")
 

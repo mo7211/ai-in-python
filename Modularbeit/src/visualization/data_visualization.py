@@ -6,7 +6,7 @@ import logging
 from utils import *
 
 
-def visualize_cleaning(df: DataFrame, title: str = '', show_plots: bool = True):
+def visualize_dataframe(df: DataFrame, title: str = '', show_plots: bool = True):
     if df is not None and config.VISUALIZE:
         title = ' ' + title if len(title) > 0 else ''
         # Visualization before cleaning

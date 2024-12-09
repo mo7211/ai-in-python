@@ -9,8 +9,8 @@ from utils import *
 
 
 @LogExecutionTime
-def clean_data(df: DataFrame, split_option: SplitOption):
-    if config.CLEAN:
+def clean_data(df: DataFrame, split_option: SplitOption, run:bool):
+    if run:
         logging.info('Clean data')
 
         logging.info(50*"=")
@@ -66,6 +66,8 @@ def clean_data(df: DataFrame, split_option: SplitOption):
         cleaned_df.to_csv(config.CLEANED_DATA_PATH, index=False)
 
         splitted_df = split_dataframe(cleaned_df, split_option)
+
+        log_df_shape(splitted_df)
 
         splitted_df.to_csv(
             config.SPLITTED_DATA_PATH, index=False)
