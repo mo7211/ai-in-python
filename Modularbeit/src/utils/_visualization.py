@@ -11,6 +11,7 @@ from sklearn.base import BaseEstimator
 from sklearn.linear_model import SGDRegressor
 import seaborn as sns
 from scipy.stats import norm
+from sklearn.pipeline import Pipeline
 
 import config
 from utils._logging import get_time
@@ -101,7 +102,7 @@ def calculate_null_ratios(df: DataFrame):
     return df_is_null / df.shape[0] * 100
 
 
-def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300):
+def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300,):
 
     path = config.IMAGES_PATH / f"{fig_id}.{fig_extension}"
     if tight_layout:
@@ -110,10 +111,12 @@ def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300
 
 
 def plot_pairplot(df: DataFrame, target: str):
+    if target == 'price':
+        target = 'condition'
     sns.pairplot(df, hue=target)
-    title = 'pairplot_' + target
-    save_fig(plt, title)
-    plt.show()
+    title = 'Pairplot ' + target
+    save_fig(plt, title, resolution=100)
+    # plt.show()
     plt.clf()
 
 
@@ -232,9 +235,9 @@ def plot_pca_explained_variance(pca):
     plt.annotate("Elbow", xy=(26, 0.95), xytext=(70, 0.7),
                  arrowprops=dict(arrowstyle="->"))
     plt.grid(True)
-    title = "explained_variance_plot"
+    title = "Explained variance"
     save_fig(plt, title)
-    plt.show()
+    # plt.show()
     # # ## Visualize distribution of cellar, lift,
     plt.clf()
 
@@ -300,35 +303,42 @@ def plot_pca_best_projection(df: DataFrame):
     plt.xlabel("$z_1$")
     plt.grid()
 
-    save_fig(plt, "pca_best_projection_plot")
-    plt.show()
+    save_fig(plt, "PCA best projection")
+    # plt.show()
     plt.clf()
 
 
-def plot_feature_importance(model: BaseEstimator, X: DataFrame):
+def plot_feature_importance(pipeline: Pipeline, X: DataFrame):
+    model = pipeline.named_steps['tree']
     # feature importance calculation
     importances = model.feature_importances_
 
     # Sort feature importance with decreasing values
     indices = np.argsort(importances)[::-1]
 
+    top_n = 10
+
+    top_indices = indices[:top_n]
+
     # Sort feature names according to feature importance
-    names = [X.columns[i] for i in indices]
+    names = [X.columns[i] for i in top_indices]
+    print(len(names))
 
     # generate the diagram
     plt.figure()
 
     # generate the diagram title
-    plt.title("Feature importance")
+    title = "Feature importance"
+    plt.title(title)
 
     # add bars
-    plt.bar(range(X.shape[1]), importances[indices])
+    plt.bar(range(top_n), importances[top_indices], align='center')
 
     # feature name as name on the x-axis
-    plt.xticks(range(X.shape[1]), names, rotation=90)
+    plt.xticks(range(top_n), names, rotation=90)
 
     # show diagram
-    plt.show()
+    save_fig(plt, title)
     plt.clf()
 
     # # cellar

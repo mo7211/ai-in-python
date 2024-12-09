@@ -28,6 +28,8 @@ def main():
 
     cleaned_df = pd.read_csv(
         config.SPLITTED_DATA_PATH)
+    
+    # plot_pairplot(cleaned_df, config.TARGET)
 
     visualize_dataframe(cleaned_df, "after cleaning", show_plots)
 
@@ -40,7 +42,7 @@ def main():
 
     preprocessed_df = pd.read_csv(config.PREPROCESSED_DATA_PATH + '.csv')
 
-    plot_pairplot(preprocessed_df, config.TARGET)
+   
 
     # define target
     y, X = define_target(preprocessed_df, config.TARGET)

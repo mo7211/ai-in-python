@@ -12,6 +12,7 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from utils._cleaning import SplitOption
+from scikeras.wrappers import KerasRegressor
 
 
 class ModellingMethods(Enum):
@@ -26,6 +27,8 @@ class ModellingMethods(Enum):
     mini_batch_kmeans = 10
     kmeans = 11
     dbscan = 12
+
+    keras_regressor = 20
 
     pca = 99
 
@@ -46,7 +49,7 @@ PREPROCESS = False
 REDUCE_DIMENSIONS = False
 TRAINING = True
 HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
-MODEL_METHOD = ModellingMethods.pca_poly_regressor
+MODEL_METHOD = ModellingMethods.decision_tree
 TARGET = 'price'  # 'condition'
 PIPELINE = None
 PARAMETERS = None
@@ -137,6 +140,13 @@ if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
     elif MODEL_METHOD == ModellingMethods.pca:
         # Decision tree + dim reduction
         PIPELINE = Pipeline([('pca', PCA())])
+        PARAMETERS = {
+            'pca__n_components': [0.95]
+        }
+    elif MODEL_METHOD == ModellingMethods.keras_regressor:
+        # Decision tree + dim reduction
+        PIPELINE = Pipeline([('pca', PCA()),
+                             ('clf', KerasRegressor())])
         PARAMETERS = {
             'pca__n_components': [0.95]
         }

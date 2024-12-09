@@ -87,3 +87,10 @@ def move_old_files_to_archive(path, n_to_keep: int = 5):
             shutil.move(os.path.join(path, file),
                         os.path.join(archive_dir, file))
             # print(f"Moved {file} to archive.")
+
+def log_pipeline_steps(pipeline):
+    steps = []
+    for name, _ in pipeline.steps:
+        steps.append(name)
+    logging.info(f"Pipeline is: {steps}")
+    
