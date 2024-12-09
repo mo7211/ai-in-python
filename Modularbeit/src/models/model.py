@@ -24,8 +24,8 @@ def train_model(X_train: pd.DataFrame, y_train: pd.Series, pipeline: Pipeline, p
     logging.info('Training model started')
 
     try:
-        logging.info(f'Hyperparameter method is {
-                     config.HYPERPARAM_METHOD.name}')
+        logging.info(f'Hyperparameter method is \'{
+                     config.HYPERPARAM_METHOD.name} \'')
         log_pipeline_steps(pipeline)
         if config.HYPERPARAM_METHOD == config.HyperparamMethods.RandomizedSearchCV:
             logging.info(f'Parameters are {parameters}')

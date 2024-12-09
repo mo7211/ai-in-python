@@ -16,14 +16,20 @@ def prep_data(df: DataFrame, run:bool):
                           'year_built',
                           'last_reconstruction',
                           'floor',
-                          'rooms',
-                          'environment',
+                          'rooms'
+                         ]
+        
+        if config.SPLIT_OPTION == config.SplitOption.WITH_INDEX:
+            index_columns = [ 'environment',
                           'quality_of_living',
                           'safety',
                           'transport',
                           'services',
                           'relax',
                           'index']
+            columns_minmax.extend(index_columns)
+            
+
         scaled_df = scale_minmax(df, columns_minmax)
 
         # binarize labels

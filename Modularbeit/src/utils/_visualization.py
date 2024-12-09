@@ -104,7 +104,7 @@ def calculate_null_ratios(df: DataFrame):
 
 def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300,):
 
-    path = config.IMAGES_PATH / f"{fig_id}.{fig_extension}"
+    path = config.IMAGES_PATH / f"{fig_id} {config.SPLIT_OPTION.value}.{fig_extension}"
     if tight_layout:
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)
@@ -210,13 +210,15 @@ def create_heatmap(df: DataFrame):
     plt.clf()
 
 
-def plot_tree(pipeline, X):
+def plot_tree(pipeline, X, suffix: str):
     decision_tree = pipeline.named_steps['tree']
 
     # Plot the decision tree
     plt.figure(figsize=(20, 10))
     tree.plot_tree(decision_tree, feature_names=X.columns, filled=True)
-    save_fig(plt, 'Tree')
+    title = 'Tree ' + config.MODEL_METHOD.name
+    plt.title(title)
+    save_fig(plt, title)
     plt.clf()
 
 
@@ -308,8 +310,8 @@ def plot_pca_best_projection(df: DataFrame):
     plt.clf()
 
 
-def plot_feature_importance(pipeline: Pipeline, X: DataFrame):
-    model = pipeline.named_steps['tree']
+def plot_feature_importance(pipeline: Pipeline, X: DataFrame, pipeline_step: str):
+    model = pipeline.named_steps[pipeline_step]
     # feature importance calculation
     importances = model.feature_importances_
 
@@ -322,13 +324,12 @@ def plot_feature_importance(pipeline: Pipeline, X: DataFrame):
 
     # Sort feature names according to feature importance
     names = [X.columns[i] for i in top_indices]
-    print(len(names))
 
     # generate the diagram
     plt.figure()
 
     # generate the diagram title
-    title = "Feature importance"
+    title = "Feature importance " + config.MODEL_METHOD.name
     plt.title(title)
 
     # add bars

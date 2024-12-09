@@ -9,7 +9,7 @@ from utils import *
 
 
 @LogExecutionTime
-def clean_data(df: DataFrame, split_option: SplitOption, run:bool):
+def clean_data(df: DataFrame, split_option: SplitOption, run: bool):
     if run:
         logging.info('Clean data')
 
@@ -35,11 +35,11 @@ def clean_data(df: DataFrame, split_option: SplitOption, run:bool):
         replace_value_in_column(
             cleaned_df, "condition", "New building", "Original condition")
 
-        replace_value_in_column(
-            cleaned_df, "construction_type", np.nan, "Unknown")
+        replace_NaN_in_column(
+            cleaned_df, "construction_type", "Unknown")
 
-        replace_value_in_column(
-            cleaned_df, "certificate", np.nan, "Unknown")
+        replace_NaN_in_column(
+            cleaned_df, "certificate", "Unknown")
 
         clean_rows_floor(cleaned_df)
 

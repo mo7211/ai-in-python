@@ -18,7 +18,7 @@ from scikeras.wrappers import KerasRegressor
 class ModellingMethods(Enum):
     pca_poly_regressor = 1
     pca_decision_tree = 2
-    pca_random_forrest = 3
+    pca_random_forest = 3
     pca_scaler_svr = 4
     scaler_svr = 5
     decision_tree = 6
@@ -44,13 +44,15 @@ class HyperparamMethods(Enum):
 # Options
 VISUALIZE = False
 
-CLEAN = False
-PREPROCESS = False
+CLEAN = True
+PREPROCESS = True
 REDUCE_DIMENSIONS = False
 TRAINING = True
 HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
 MODEL_METHOD = ModellingMethods.decision_tree
 TARGET = 'price'  # 'condition'
+SPLIT_OPTION = SplitOption.WITHOUT_INDEX
+
 PIPELINE = None
 PARAMETERS = None
 
@@ -95,13 +97,13 @@ if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
         PARAMETERS = {'pca__n_components': [0.95],
                       'tree__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None]
                       }
-    elif MODEL_METHOD == ModellingMethods.pca_random_forrest:
+    elif MODEL_METHOD == ModellingMethods.pca_random_forest:
         # Decision tree + dim reduction
         PIPELINE = Pipeline([('pca', PCA()),
-                            ('random_forrest', RandomForestRegressor(random_state=0))])
+                            ('random_forest', RandomForestRegressor(random_state=0))])
         PARAMETERS = {'pca__n_components': [0.95],
-                      'random_forrest__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None],
-                      'random_forrest__n_jobs': [12]
+                      'random_forest__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None],
+                      'random_forest__n_jobs': [12]
                       }
     elif MODEL_METHOD == ModellingMethods.scaler_svr:
         # Decision tree + dim reduction
@@ -151,7 +153,7 @@ if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
             'pca__n_components': [0.95]
         }
 
-SPLIT_OPTION = SplitOption.WITH_INDEX
+
 SHOW_PLOTS = False
 BINARIZE = False
 TEST_SIZE = 0.3
@@ -172,7 +174,8 @@ PREPROCESSED_DATA_PATH = 'Modularbeit/data/features/re_preprosessed_' + \
 
 IMAGES_PATH = Path('Modularbeit') / 'images'
 IMAGES_PATH.mkdir(parents=True, exist_ok=True)
-LOGGING_PATH = 'Modularbeit/logging'
+LOGGING_PATH = 'Modularbeit/logging/' + \
+    SPLIT_OPTION.value
 
 # Preprossesing
 
