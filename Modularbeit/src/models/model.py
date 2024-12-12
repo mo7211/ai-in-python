@@ -14,7 +14,7 @@ from sklearn.preprocessing import PolynomialFeatures
 
 from utils._visualization import plot_tree
 import config
-from utils._logging import LogExecutionTime
+from utils._logging import LogExecutionTime, log_pipeline_steps
 from utils._models import log_metrics
 from utils._hyperparams import create_hyperparam_model
 
@@ -24,8 +24,9 @@ def train_model(X_train: pd.DataFrame, y_train: pd.Series, pipeline: Pipeline, p
     logging.info('Training model started')
 
     try:
-        logging.info(f'Hyperparameter method is {
-                     config.HYPERPARAM_METHOD.name}')
+        logging.info(f'Hyperparameter method is \'{
+                     config.HYPERPARAM_METHOD.name} \'')
+        log_pipeline_steps(pipeline)
         if config.HYPERPARAM_METHOD == config.HyperparamMethods.RandomizedSearchCV:
             logging.info(f'Parameters are {parameters}')
             clf = RandomizedSearchCV(

@@ -6,7 +6,7 @@ import logging
 from utils import *
 
 
-def visualize_cleaning(df: DataFrame, title: str = '', show_plots: bool = True):
+def visualize_dataframe(df: DataFrame, title: str = '', show_plots: bool = True):
     if df is not None and config.VISUALIZE:
         title = ' ' + title if len(title) > 0 else ''
         # Visualization before cleaning
@@ -31,4 +31,5 @@ def visualize_cleaning(df: DataFrame, title: str = '', show_plots: bool = True):
 
         plot_distribution(df, 'price', title)
         plot_distribution(df, 'area', title)
-        plot_distribution(df, 'index', title)
+        if config.SPLIT_OPTION == config.SplitOption.WITH_INDEX:
+            plot_distribution(df, 'index', title)

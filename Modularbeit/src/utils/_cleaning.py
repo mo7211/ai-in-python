@@ -1,6 +1,7 @@
 from enum import Enum
 import logging
 import numpy as np
+import pandas as pd
 from pandas import DataFrame
 from typing import List, Union
 
@@ -33,13 +34,24 @@ def clean_rows_floor(df: DataFrame):
     return df
 
 
-def replace_value_in_column(df: DataFrame, column: str, value_old: str, value_new: str):
+def replace_value_in_column(df: DataFrame, column: str, value_old, value_new: str):
     rows_before = df.shape[0]
 
     df[column] = df[column].replace(value_old, value_new)
 
     rows_after = df.shape[0]
-    logging.info(str(rows_before - rows_after) + ' rows deleted.')
+    logging.info(f'{str(rows_before - rows_after)} rows in column \'{
+                 column}\' replaced value \'{str(value_old)}\' with \'{value_new}.')
+    return df
+
+
+def replace_NaN_in_column(df: DataFrame, column: str, value_new: str):
+    n_na = df[column].isna().sum()
+
+    df[column] = df[column].fillna(value_new)
+
+    logging.info(f'{str(n_na)} rows in column \'{
+                 column}\' replaced value \'NaN\' with \'{value_new}\'.')
     return df
 
 
@@ -121,7 +133,7 @@ def split_dataframe(df: DataFrame, option: Union[SplitOption, str]) -> None:
 
     elif option == SplitOption.WITHOUT_INDEX:
         logging.info('splitting dataframe without index')
-        df_without_index = df.drop(['quality_of_living', 'safety', 'transport',
+        df_without_index = df.drop(['index', 'quality_of_living', 'safety', 'transport',
                                    'services', 'relax', 'environment'], axis=1, inplace=False)
         return df_without_index
     else:
@@ -136,3 +148,20 @@ def convert_column_to_type(df: DataFrame, columns: list[str], type_=float) -> No
             df[c] = df[c].str.replace(',', '.').astype(type_)
         elif type_ == int:
             df[c] = df[c].astype(type_)
+
+
+def read_data(input_path, run: bool):
+    if run:
+        df = pd.read_csv(
+            input_path, sep=";")
+
+        columns_float = ['area',
+                         'environment',
+                         'quality_of_living',
+                         'safety',
+                         'transport',
+                         'services',
+                         'index',
+                         'relax']
+        convert_column_to_type(df, columns_float, float)
+        return df
