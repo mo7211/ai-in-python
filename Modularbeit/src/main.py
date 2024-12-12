@@ -3,13 +3,12 @@
 import logging
 import pandas as pd
 
-# visualize_cleaning, create_pairplot, create_heatmap, plot_tree, plot_pairplot
-from visualization import *
+from visualization import visualize_dataframe
 from utils import configurize_logger, define_target, read_data
 from data import clean_data, prep_data, reduce_dimensions
 from models import *
+
 import config
-from config import ModellingMethods
 
 
 def main():

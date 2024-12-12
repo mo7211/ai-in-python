@@ -17,12 +17,15 @@ from scikeras.wrappers import KerasRegressor
 
 class ModellingMethods(Enum):
     pca_poly_regressor = 1
+    poly_regressor = 1.1
     pca_decision_tree = 2
     pca_random_forest = 3
     pca_scaler_svr = 4
     scaler_svr = 5
     decision_tree = 6
-    pca_scaler_poly_regressor = 7
+    random_forest = 7
+
+    pca_scaler_poly_regressor = 8
 
     mini_batch_kmeans = 10
     kmeans = 11
@@ -49,7 +52,7 @@ PREPROCESS = False
 REDUCE_DIMENSIONS = False
 TRAINING = True
 HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
-MODEL_METHOD = ModellingMethods.pca_random_forest
+MODEL_METHOD = ModellingMethods.poly_regressor
 TARGET = 'price'  # 'condition'
 SPLIT_OPTION = SplitOption.WITH_INDEX
 
@@ -73,6 +76,15 @@ if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
                       'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
                       'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
                       }
+    if MODEL_METHOD == ModellingMethods.poly_regressor:
+        PIPELINE = Pipeline([('poly', PolynomialFeatures(include_bias=False)),
+                            ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))])
+        PARAMETERS = {
+            'poly__degree': [1, 2, 3],
+            'regressor__max_iter': [1000, 2000, 3000],
+            'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
+            'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
+        }
     if MODEL_METHOD == ModellingMethods.pca_scaler_poly_regressor:
         PIPELINE = Pipeline([('pca', PCA()),
                              ('scaler', StandardScaler()),
@@ -105,6 +117,14 @@ if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
                       'random_forest__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None],
                       'random_forest__n_jobs': [12]
                       }
+    elif MODEL_METHOD == ModellingMethods.random_forest:
+        # Decision tree + dim reduction
+        PIPELINE = Pipeline(
+            [('random_forest', RandomForestRegressor(random_state=0))])
+        PARAMETERS = {
+            'random_forest__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None],
+            'random_forest__n_jobs': [12]
+        }
     elif MODEL_METHOD == ModellingMethods.scaler_svr:
         # Decision tree + dim reduction
         PIPELINE = Pipeline([('scaler', StandardScaler()),
@@ -169,6 +189,8 @@ SPLITTED_DATA_PATH = 'Modularbeit/data/cleaned_data/re_cleaned_' + \
     SPLIT_OPTION.value + '.csv'
 PREPROCESSED_DATA_PATH = 'Modularbeit/data/features/re_preprosessed_' + \
     SPLIT_OPTION.value
+
+METRICS_PATH = 'Modularbeit/data/metrics/metrics.csv'
 
 # Paths
 

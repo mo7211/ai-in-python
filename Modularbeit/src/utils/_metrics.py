@@ -1,52 +1,88 @@
 import logging
+import os
+import pandas as pd
 from sklearn import metrics
-from sklearn.metrics import average_precision_score, mean_squared_error
+from sklearn.metrics import average_precision_score, explained_variance_score, max_error, mean_squared_error
 
 
 def is_in_pipeline(model, model_class):
     return any(isinstance(step, model_class) for _, step in model.steps)
 
 
-def log_mean_squared_error(model, X_test, y_test):
+def log_mean_squared_error(model, X_test, y_test, metrics_: dict):
     if model:
         y_pred = model.predict(X_test)
 
-        mse = mean_squared_error(y_test, y_pred)
-        # aps = average_precision_score(y_test, y_pred)
+        metrics_['mean squared error'] = mean_squared_error(y_test, y_pred)
 
-        logging.info(f'Mean squared error is: {mse}')
-
-        # logging.info(f'average precision score is: {aps}')
-        return mse
-    else:
-        return None
+        logging.info(f'Mean squared error is: {
+                     metrics_['mean squared error']}')
 
 
-def log_max_error(model, X_test, y_test):
+def log_max_error(model, X_test, y_test, metrics_: dict):
     if model:
         y_pred = model.predict(X_test)
 
-        max_error = max_error(y_test, y_pred)
-        logging.info(f'Max error is: {max_error}')
-
-        return max_error
-    else:
-        return None
+        metrics_['max error'] = max_error(y_test, y_pred)
+        logging.info(f'Max error is: {metrics_['max error']}')
 
 
-def log_average_precision_score(model, X_test, y_test):
+def log_average_precision_score(model, X_test, y_test, metrics_: dict):
     if model:
         y_pred = model.predict(X_test)
 
-        aps = average_precision_score(y_test, y_pred)
+        metrics_['average precision score'] = average_precision_score(
+            y_test, y_pred)
 
-        logging.info(f'Average precision score is: {aps}')
-        return aps
-    else:
-        return None
+        logging.info(f'Average precision score is: {
+                     metrics_['average precision score']}')
 
 
-def log_silhouette(model, X):
+def log_silhouette(model, X: pd.DataFrame, metrics_: dict):
     labels = model.labels_
-    silhouette = metrics.silhouette_score(X, labels, metric='euclidean')
-    logging.info(f'Silhouette is: {silhouette}')
+    metrics_['silhouette'] = metrics.silhouette_score(
+        X, labels, metric='euclidean')
+    logging.info(f'Silhouette is: {metrics_['silhouette']}')
+
+
+def log_explained_variance_score(model, X_test, y_test, metrics_: dict):
+    if model:
+        y_pred = model.predict(X_test)
+
+        metrics_['explained variance score'] = explained_variance_score(
+            y_test, y_pred)
+
+        logging.info(f'Explained variance score is: {
+                     metrics_['explained variance score']}, 1.0 is best')
+
+
+def ensure_directory_exists(filepath):
+    # Get the directory name from the filepath
+    directory = os.path.dirname(filepath)
+
+    # Create the directory if it doesn't exist
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+        explained_variance_score(y_true, y_pred)
+
+
+def write_run_metrics_to_csv(filepath, run_name, metrics):
+
+    ensure_directory_exists(filepath)
+
+    # Convert metrics dictionary to a DataFrame with the run name included
+    metrics_df = pd.DataFrame([metrics])
+    metrics_df['Run Name'] = run_name
+
+    # Check if the file already exists
+    if os.path.exists(filepath):
+        # If the file exists, append to it
+        existing_df = pd.read_csv(filepath)
+        combined_df = pd.concat([existing_df, metrics_df], ignore_index=True)
+    else:
+        # If the file doesn't exist, start fresh
+        combined_df = metrics_df
+
+    # Write the combined DataFrame to the CSV
+    combined_df.to_csv(filepath, index=False)
