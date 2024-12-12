@@ -11,6 +11,7 @@ from sklearn.base import BaseEstimator
 from sklearn.linear_model import SGDRegressor
 import seaborn as sns
 from scipy.stats import norm
+from sklearn.model_selection import learning_curve
 from sklearn.pipeline import Pipeline
 
 import config
@@ -104,7 +105,8 @@ def calculate_null_ratios(df: DataFrame):
 
 def save_fig(plt, fig_id, tight_layout=True, fig_extension="png", resolution=300,):
 
-    path = config.IMAGES_PATH / f"{fig_id} {config.SPLIT_OPTION.value}.{fig_extension}"
+    path = config.IMAGES_PATH / \
+        f"{fig_id} {config.SPLIT_OPTION.value}.{fig_extension}"
     if tight_layout:
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)
@@ -340,6 +342,33 @@ def plot_feature_importance(pipeline: Pipeline, X: DataFrame, pipeline_step: str
 
     # show diagram
     save_fig(plt, title)
+    plt.clf()
+
+
+def plot_learning_curve(model, X: DataFrame, y: DataFrame):
+
+    train_sizes, train_scores, valid_scores = learning_curve(
+        model, X, y, train_sizes=np.linspace(0.01, 1.0, 40), cv=5,
+        scoring="neg_root_mean_squared_error")
+    train_errors = -train_scores.mean(axis=1)
+    valid_errors = -valid_scores.mean(axis=1)
+
+    plt.figure(figsize=(6, 4))  # extra code – not needed, just formatting
+    plt.plot(train_sizes, train_errors, "r-+", linewidth=2, label="train")
+    plt.plot(train_sizes, valid_errors, "b-", linewidth=3, label="valid")
+
+    title = "Learning curve " + config.MODEL_METHOD.name
+    plt.title(title)
+
+    # extra code – beautifies and saves Figure 4–15
+    plt.xlabel("Training set size")
+    plt.ylabel("RMSE")
+    plt.grid()
+    plt.legend(loc="upper right")
+    # plt.axis([0, 80, 0, 2.5])
+    save_fig(plt, title)
+
+    plt.show()
     plt.clf()
 
     # # cellar

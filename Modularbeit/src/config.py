@@ -44,14 +44,14 @@ class HyperparamMethods(Enum):
 # Options
 VISUALIZE = False
 
-CLEAN = True
-PREPROCESS = True
+CLEAN = False
+PREPROCESS = False
 REDUCE_DIMENSIONS = False
 TRAINING = True
 HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
-MODEL_METHOD = ModellingMethods.decision_tree
+MODEL_METHOD = ModellingMethods.pca_random_forest
 TARGET = 'price'  # 'condition'
-SPLIT_OPTION = SplitOption.WITHOUT_INDEX
+SPLIT_OPTION = SplitOption.WITH_INDEX
 
 PIPELINE = None
 PARAMETERS = None

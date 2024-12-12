@@ -5,41 +5,53 @@ from sklearn.base import BaseEstimator
 from sklearn.cluster import DBSCAN, MiniBatchKMeans
 from sklearn.discriminant_analysis import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC, SVR
 from sklearn.tree import DecisionTreeRegressor
 
 import config
-from utils import log_metrics, plot_tree, is_in_pipeline, plot_feature_importance
+from utils._visualization import *
+from utils._models import *
+from utils._metrics import *
+# import log_mean_squared_error, plot_tree, is_in_pipeline, plot_feature_importance, plot_learning_curve, log_silhouette
 
 
 def measure_model(model: BaseEstimator, X_test: DataFrame, y_test: DataFrame, X: DataFrame, y: DataFrame) -> BaseEstimator:
     if model is not None and X is not None and y is not None and isinstance(model, Pipeline):
         logging.info('Generate metrics')
         if is_in_pipeline(model, DBSCAN) or is_in_pipeline(model, MiniBatchKMeans):
-            log_metrics(model, X_test, y_test)
+            log_mean_squared_error(model, X_test, y_test)
 
             labels = np.unique(y_test.values)
             logging.info(f'Unique labels are: {labels}')
 
-        elif is_in_pipeline(model, DecisionTreeRegressor):
-            plot_tree(model, X_test, 'Decision Tree Regressor')
-
-            plot_feature_importance(model, X_test, 'tree')
-
-            log_metrics(model, X_test, y_test)
-        elif is_in_pipeline(model, RandomForestRegressor):
-            # plot_tree(model, X_test, 'Random Forest Regressor')
-
-            plot_feature_importance(model, X_test, 'random_forest')
-
-            log_metrics(model, X_test, y_test)
-
-        elif is_in_pipeline(model, SVC) or is_in_pipeline(model, SVR):
-            # Lecture_05_Support_Vector_Machines_8_solution 2 Grafiken
-            log_metrics(model, X_test, y_test)
+            log_silhouette(model, X_test)
         else:
-            log_metrics(model, X_test, y_test)
+
+            if is_in_pipeline(model, DecisionTreeRegressor):
+                plot_tree(model, X_test, 'Decision Tree Regressor')
+
+                plot_feature_importance(model, X_test, 'tree')
+
+            elif is_in_pipeline(model, RandomForestRegressor):
+                # plot_tree(model, X_test, 'Random Forest Regressor')
+
+                plot_feature_importance(model, X_test, 'random_forest')
+                plot_learning_curve(model, X, y)
+
+            elif is_in_pipeline(model, LinearRegression) or is_in_pipeline(model, SGDRegressor):
+                plot_learning_curve(model, X, y)
+
+            # elif is_in_pipeline(model, SVC) or is_in_pipeline(model, SVR):
+            #     # Lecture_05_Support_Vector_Machines_8_solution 2 Grafiken
+            #     placeholder = 1
+
+            log_mean_squared_error(model, X_test, y_test)
+            log_max_error(model, X_test, y_test)
+            log_average_precision_score(model, X_test, y_test)
+
+            # write those to csv and create diagram
 
         return model
     else:
