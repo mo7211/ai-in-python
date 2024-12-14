@@ -4,6 +4,8 @@ import pandas as pd
 from sklearn import metrics
 from sklearn.metrics import average_precision_score, explained_variance_score, max_error, mean_squared_error
 
+from utils._logging import get_time
+
 
 def is_in_pipeline(model, model_class):
     return any(isinstance(step, model_class) for _, step in model.steps)
@@ -64,8 +66,6 @@ def ensure_directory_exists(filepath):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-        explained_variance_score(y_true, y_pred)
-
 
 def write_run_metrics_to_csv(filepath, run_name, metrics):
 
@@ -73,7 +73,8 @@ def write_run_metrics_to_csv(filepath, run_name, metrics):
 
     # Convert metrics dictionary to a DataFrame with the run name included
     metrics_df = pd.DataFrame([metrics])
-    metrics_df['Run Name'] = run_name
+    metrics_df['run name'] = run_name
+    metrics_df['run time'] = get_time()
 
     # Check if the file already exists
     if os.path.exists(filepath):

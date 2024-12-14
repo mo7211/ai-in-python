@@ -10,32 +10,125 @@ from sklearn.linear_model import SGDRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.svm import SVR
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.tree import DecisionTreeRegressor
 from utils._cleaning import SplitOption
 from scikeras.wrappers import KerasRegressor
 
 
 class ModellingMethods(Enum):
-    pca_poly_regressor = 1
-    poly_regressor = 1.1
-    pca_decision_tree = 2
-    pca_random_forest = 3
-    pca_scaler_svr = 4
-    scaler_svr = 5
-    decision_tree = 6
-    random_forest = 7
+    training_off = (None, None)
 
-    pca_scaler_poly_regressor = 8
+    pca_poly_regressor = (
+        Pipeline([('pca', PCA()),
+                  ('poly', PolynomialFeatures(include_bias=False)),
+                  ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))]),
+        {'pca__n_components': [0.95],
+         'poly__degree': [1, 2, 3],
+         'regressor__max_iter': [1000, 2000, 3000],
+         'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
+         'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
+         })
+    poly_regressor = (
+        Pipeline([('poly', PolynomialFeatures(include_bias=False)),
+                  ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))]),
+        {
+            'poly__degree': [1, 2, 3],
+            'regressor__max_iter': [1000, 2000, 3000],
+            'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
+            'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
+        })
+    pca_scaler_poly_regressor = (
+        Pipeline([('pca', PCA()),
+                  ('scaler', StandardScaler()),
+                  ('poly', PolynomialFeatures(include_bias=False)),
+                  ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))]),
+        {'pca__n_components': [0.95],
+         'poly__degree': [1, 2, 3],
+         'regressor__max_iter': [1000, 2000, 3000],
+         'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
+         'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
+         })
 
-    mini_batch_kmeans = 10
-    kmeans = 11
-    dbscan = 12
+    decision_tree = (
+        Pipeline([('tree', DecisionTreeRegressor(random_state=0))]),
+        {
+            'tree__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None]
+        })
 
-    keras_regressor = 20
+    pca_decision_tree = (
+        Pipeline([('pca', PCA()),
+                  ('tree', DecisionTreeRegressor(random_state=0))]),
+        {'pca__n_components': [0.95],
+         'tree__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None]
+         })
 
-    pca = 99
+    pca_random_forest = (
+        Pipeline([('pca', PCA()),
+                  ('random_forest', RandomForestRegressor(random_state=0))]),
+        {'pca__n_components': [0.95],
+         'random_forest__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None],
+         'random_forest__n_jobs': [12]
+         })
+    random_forest = (
+        # Decision tree + dim reduction
+        Pipeline(
+            [('random_forest', RandomForestRegressor(random_state=0))]),
+        {
+            'random_forest__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None],
+            'random_forest__n_jobs': [12]
+        })
+    scaler_svr = (
+        # Decision tree + dim reduction
+        Pipeline([('scaler', StandardScaler()),
+                  ('svr', SVR())]),
+        {'svr__C': [1, 0.9, 0.5, 0.1, 2, 5, 10],
+         'svr__kernel': ['linear',
+                         'poly', 'rbf'],
+         'svr__gamma': [1]
+         })
+    pca_scaler_svr = (
+        # Decision tree + dim reduction
+        Pipeline([('pca', PCA()),
+                  ('scaler', StandardScaler()),
+                  ('svr', SVR())]),
+        {'pca__n_components': [0.95],
+         'svr__C': [1, 0.9, 0.5, 0.1, 2, 5, 10],
+         'svr__kernel': ['linear',
+                         'poly', 'rbf'],
+         'svr__gamma': [1]
+         })
+    mini_batch_kmeans = (
+        # Decision tree + dim reduction
+        Pipeline([('scaler', StandardScaler()),
+                  ('minibatchkmeans', MiniBatchKMeans(random_state=0, batch_size=100))]),
+        {
+            'minibatchkmeans__n_clusters': [2, 3, 4, 5, 6, 7, 8]
+        })
+    dbscan = (
+        # Decision tree + dim reduction
+        Pipeline([('scaler', StandardScaler()),
+                  ('dbscan', DBSCAN(n_jobs=-1))]),
+        {
+            'minibatchkmeans__n_clusters': [2, 3, 4, 5, 6, 7, 8]
+        })
 
-    training_off = False
+    pca = (
+        # Decision tree + dim reduction
+        Pipeline([('pca', PCA())]),
+        {
+            'pca__n_components': [0.95]
+        })
+    keras_regressor = (
+        # Decision tree + dim reduction
+        Pipeline([('pca', PCA()),
+                  ('clf', KerasRegressor())]),
+        {
+            'pca__n_components': [0.95]
+        })
+
+    def __init__(self, pipeline, parameters):
+        self.pipeline = pipeline
+        self.parameters = parameters
 
 
 class HyperparamMethods(Enum):
@@ -52,127 +145,16 @@ PREPROCESS = False
 REDUCE_DIMENSIONS = False
 TRAINING = True
 HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
-MODEL_METHOD = ModellingMethods.poly_regressor
+MODEL_METHOD = ModellingMethods.pca_decision_tree
 TARGET = 'price'  # 'condition'
 SPLIT_OPTION = SplitOption.WITH_INDEX
 
-PIPELINE = None
-PARAMETERS = None
+PIPELINE = MODEL_METHOD.pipeline
+PARAMETERS = MODEL_METHOD.parameters
 
 if not TRAINING:
     HYPERPARAM_METHOD = HyperparamMethods.parameter_search_off
     MODEL_METHOD = ModellingMethods.training_off
-
-
-# Regression + dim reduction
-if HYPERPARAM_METHOD == HyperparamMethods.RandomizedSearchCV:
-    if MODEL_METHOD == ModellingMethods.pca_poly_regressor:
-        PIPELINE = Pipeline([('pca', PCA()),
-                            ('poly', PolynomialFeatures(include_bias=False)),
-                            ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))])
-        PARAMETERS = {'pca__n_components': [0.95],
-                      'poly__degree': [1, 2, 3],
-                      'regressor__max_iter': [1000, 2000, 3000],
-                      'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
-                      'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
-                      }
-    if MODEL_METHOD == ModellingMethods.poly_regressor:
-        PIPELINE = Pipeline([('poly', PolynomialFeatures(include_bias=False)),
-                            ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))])
-        PARAMETERS = {
-            'poly__degree': [1, 2, 3],
-            'regressor__max_iter': [1000, 2000, 3000],
-            'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
-            'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
-        }
-    if MODEL_METHOD == ModellingMethods.pca_scaler_poly_regressor:
-        PIPELINE = Pipeline([('pca', PCA()),
-                             ('scaler', StandardScaler()),
-                            ('poly', PolynomialFeatures(include_bias=False)),
-                            ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))])
-        PARAMETERS = {'pca__n_components': [0.95],
-                      'poly__degree': [1, 2, 3],
-                      'regressor__max_iter': [1000, 2000, 3000],
-                      'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
-                      'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
-                      }
-    elif MODEL_METHOD == ModellingMethods.decision_tree:
-        # Decision tree + dim reduction
-        PIPELINE = Pipeline([('tree', DecisionTreeRegressor(random_state=0))])
-        PARAMETERS = {
-            'tree__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None]
-        }
-    elif MODEL_METHOD == ModellingMethods.pca_decision_tree:
-        # Decision tree + dim reduction
-        PIPELINE = Pipeline([('pca', PCA()),
-                            ('tree', DecisionTreeRegressor(random_state=0))])
-        PARAMETERS = {'pca__n_components': [0.95],
-                      'tree__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None]
-                      }
-    elif MODEL_METHOD == ModellingMethods.pca_random_forest:
-        # Decision tree + dim reduction
-        PIPELINE = Pipeline([('pca', PCA()),
-                            ('random_forest', RandomForestRegressor(random_state=0))])
-        PARAMETERS = {'pca__n_components': [0.95],
-                      'random_forest__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None],
-                      'random_forest__n_jobs': [12]
-                      }
-    elif MODEL_METHOD == ModellingMethods.random_forest:
-        # Decision tree + dim reduction
-        PIPELINE = Pipeline(
-            [('random_forest', RandomForestRegressor(random_state=0))])
-        PARAMETERS = {
-            'random_forest__max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, None],
-            'random_forest__n_jobs': [12]
-        }
-    elif MODEL_METHOD == ModellingMethods.scaler_svr:
-        # Decision tree + dim reduction
-        PIPELINE = Pipeline([('scaler', StandardScaler()),
-                            ('svr', SVR())])
-        PARAMETERS = {'svr__C': [1, 0.9, 0.5, 0.1, 2, 5, 10],
-                      'svr__kernel': ['linear',
-                                      'poly', 'rbf'],
-                      'svr__gamma': [1]
-                      }
-    elif MODEL_METHOD == ModellingMethods.pca_scaler_svr:
-        # Decision tree + dim reduction
-        PIPELINE = Pipeline([('pca', PCA()),
-                            ('scaler', StandardScaler()),
-                            ('svr', SVR())])
-        PARAMETERS = {'pca__n_components': [0.95],
-                      'svr__C': [1, 0.9, 0.5, 0.1, 2, 5, 10],
-                      'svr__kernel': ['linear',
-                                      'poly', 'rbf'],
-                      'svr__gamma': [1]
-                      }
-    elif MODEL_METHOD == ModellingMethods.mini_batch_kmeans:
-        # Decision tree + dim reduction
-        PIPELINE = Pipeline([('scaler', StandardScaler()),
-                            ('minibatchkmeans', MiniBatchKMeans(random_state=0, batch_size=100))])
-        PARAMETERS = {
-            'minibatchkmeans__n_clusters': [2, 3, 4, 5, 6, 7, 8]
-        }
-    elif MODEL_METHOD == ModellingMethods.dbscan:
-        # Decision tree + dim reduction
-        PIPELINE = Pipeline([('scaler', StandardScaler()),
-                            ('dbscan', DBSCAN(n_jobs=-1))])
-        PARAMETERS = {
-            'minibatchkmeans__n_clusters': [2, 3, 4, 5, 6, 7, 8]
-        }
-    elif MODEL_METHOD == ModellingMethods.pca:
-        # Decision tree + dim reduction
-        PIPELINE = Pipeline([('pca', PCA())])
-        PARAMETERS = {
-            'pca__n_components': [0.95]
-        }
-    elif MODEL_METHOD == ModellingMethods.keras_regressor:
-        # Decision tree + dim reduction
-        PIPELINE = Pipeline([('pca', PCA()),
-                             ('clf', KerasRegressor())])
-        PARAMETERS = {
-            'pca__n_components': [0.95]
-        }
-
 
 SHOW_PLOTS = False
 BINARIZE = False
