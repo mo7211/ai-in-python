@@ -11,12 +11,67 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
-from utils._cleaning import SplitOption
 from scikeras.wrappers import KerasRegressor
+from keras import Sequential
+from keras.api.layers import Dense, Input, Dropout
+
+from utils._cleaning import SplitOption
+
+# def create_model(input_dim, optimizer='adam'):
+#     model = Sequential()
+#     model.add(Dense(64, input_dim=input_dim, activation='relu'))
+#     model.add(Dense(32, activation='relu'))
+#     model.add(Dense(1, activation='linear'))  # Adjust output layer for regression
+#     model.compile(optimizer=optimizer, loss='mean_squared_error')
+#     return model
+
+
+def create_model(optimizer="adam", dropout=0.1, init='uniform', nbr_features=164, dense_nparams=256):
+    model = Sequential()
+    model.add(Dense(dense_nparams, activation='relu',
+              input_shape=(nbr_features,), kernel_initializer=init,))
+    model.add(Dropout(dropout), )
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy',
+                  optimizer=optimizer, metrics=["accuracy"])
+    return model
+
+
+def create_model_pca(optimizer="adam", dropout=0.1, init='uniform', nbr_features=27, dense_nparams=256):
+    model = Sequential()
+    model.add(Dense(dense_nparams, activation='relu',
+              input_shape=(nbr_features,), kernel_initializer=init,))
+    model.add(Dropout(dropout), )
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy',
+                  optimizer=optimizer, metrics=["accuracy"])
+    return model
 
 
 class ModellingMethods(Enum):
     training_off = (None, None)
+
+    pca_keras_regressor = (
+        # Decision tree + dim reduction
+        Pipeline([('pca', PCA()),
+                  ('regressor', KerasRegressor(model=create_model_pca, verbose=0))]),
+        {
+            'pca__n_components': [0.95],
+            # Example: You can add these to the grid search
+            'regressor__epochs': [50, 100],
+            'regressor__batch_size': [10, 20],
+            'regressor__optimizer': ['adam', 'rmsprop'],
+        })
+
+    keras_regressor = (
+        # Decision tree + dim reduction
+        Pipeline([
+            ('regressor', KerasRegressor(model=create_model, verbose=0))]),
+        {
+            'regressor__epochs': [50, 100],
+            'regressor__batch_size': [10, 20],
+            'regressor__optimizer': ['adam', 'rmsprop'],
+        })
 
     pca_poly_regressor = (
         Pipeline([('pca', PCA()),
@@ -118,13 +173,6 @@ class ModellingMethods(Enum):
         {
             'pca__n_components': [0.95]
         })
-    keras_regressor = (
-        # Decision tree + dim reduction
-        Pipeline([('pca', PCA()),
-                  ('clf', KerasRegressor())]),
-        {
-            'pca__n_components': [0.95]
-        })
 
     def __init__(self, pipeline, parameters):
         self.pipeline = pipeline
@@ -145,7 +193,7 @@ PREPROCESS = False
 REDUCE_DIMENSIONS = False
 TRAINING = True
 HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
-MODEL_METHOD = ModellingMethods.pca_decision_tree
+MODEL_METHOD = ModellingMethods.pca_keras_regressor
 TARGET = 'price'  # 'condition'
 SPLIT_OPTION = SplitOption.WITH_INDEX
 

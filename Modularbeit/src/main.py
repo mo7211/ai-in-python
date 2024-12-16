@@ -12,6 +12,7 @@ import config
 
 
 def main():
+    config.MODEL_METHOD = config.ModellingMethods.pca_keras_regressor
     configurize_logger(config.MODEL_METHOD.name)
     show_plots = config.SHOW_PLOTS
 
@@ -50,6 +51,8 @@ def main():
     # train
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=config.TEST_SIZE, random_state=42)
+
+    config.DATA_SHAPE = X_train.shape
 
     model = train_model(X_train, y_train, config.PIPELINE, config.PARAMETERS)
 

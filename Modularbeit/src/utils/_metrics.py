@@ -80,7 +80,14 @@ def write_run_metrics_to_csv(filepath, run_name, metrics):
     if os.path.exists(filepath):
         # If the file exists, append to it
         existing_df = pd.read_csv(filepath)
-        combined_df = pd.concat([existing_df, metrics_df], ignore_index=True)
+        if run_name in existing_df['run name'].values:
+            # Overwrite the existing row with the new metrics
+            combined_df.loc[existing_df['run name']
+                            == run_name] = metrics_df.iloc[0]
+        else:
+            # Append the new metrics as it doesn't already exist
+            combined_df = pd.concat(
+                [existing_df, metrics_df], ignore_index=True)
     else:
         # If the file doesn't exist, start fresh
         combined_df = metrics_df
