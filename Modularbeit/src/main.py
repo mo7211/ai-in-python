@@ -12,7 +12,6 @@ import config
 
 
 def main():
-    config.MODEL_METHOD = config.ModellingMethods.pca_keras_regressor
     configurize_logger(config.MODEL_METHOD.name)
     show_plots = config.SHOW_PLOTS
 

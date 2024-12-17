@@ -26,23 +26,25 @@ from utils._cleaning import SplitOption
 #     return model
 
 
-def create_model(optimizer="adam", dropout=0.1, init='uniform', nbr_features=164, dense_nparams=256):
+def create_model(optimizer="adam", dropout=0.1, init='uniform', nbr_features=164, dense_nparams=256, activation='sigmoid', **kwargs):
     model = Sequential()
-    model.add(Dense(dense_nparams, activation='relu',
-              input_shape=(nbr_features,), kernel_initializer=init,))
+    model.add(Input(shape=(nbr_features,)))
+    model.add(Dense(dense_nparams, activation=activation,
+              kernel_initializer=init,))
     model.add(Dropout(dropout), )
-    model.add(Dense(1, activation='sigmoid'))
+    model.add(Dense(1, activation=activation))
     model.compile(loss='binary_crossentropy',
                   optimizer=optimizer, metrics=["accuracy"])
     return model
 
 
-def create_model_pca(optimizer="adam", dropout=0.1, init='uniform', nbr_features=27, dense_nparams=256):
+def create_model_pca(optimizer="adam", dropout=0.1, init='uniform', nbr_features=27, dense_nparams=256, activation='sigmoid', **kwargs):
     model = Sequential()
-    model.add(Dense(dense_nparams, activation='relu',
-              input_shape=(nbr_features,), kernel_initializer=init,))
+    model.add(Input(shape=(nbr_features,)))
+    model.add(Dense(dense_nparams, activation=activation,
+              kernel_initializer=init,))
     model.add(Dropout(dropout), )
-    model.add(Dense(1, activation='sigmoid'))
+    model.add(Dense(1, activation=activation))
     model.compile(loss='binary_crossentropy',
                   optimizer=optimizer, metrics=["accuracy"])
     return model
@@ -60,7 +62,7 @@ class ModellingMethods(Enum):
             # Example: You can add these to the grid search
             'regressor__epochs': [50, 100],
             'regressor__batch_size': [10, 20],
-            'regressor__optimizer': ['adam', 'rmsprop'],
+            'regressor__optimizer': ['adam', 'rmsprop']
         })
 
     keras_regressor = (
@@ -70,7 +72,7 @@ class ModellingMethods(Enum):
         {
             'regressor__epochs': [50, 100],
             'regressor__batch_size': [10, 20],
-            'regressor__optimizer': ['adam', 'rmsprop'],
+            'regressor__optimizer': ['adam', 'rmsprop']
         })
 
     pca_poly_regressor = (
@@ -79,7 +81,7 @@ class ModellingMethods(Enum):
                   ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))]),
         {'pca__n_components': [0.95],
          'poly__degree': [1, 2, 3],
-         'regressor__max_iter': [1000, 2000, 3000],
+         'regressor__max_iter': [2000],
          'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
          'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
          })
@@ -88,7 +90,7 @@ class ModellingMethods(Enum):
                   ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))]),
         {
             'poly__degree': [1, 2, 3],
-            'regressor__max_iter': [1000, 2000, 3000],
+            'regressor__max_iter': [2000],
             'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
             'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
         })
@@ -99,7 +101,7 @@ class ModellingMethods(Enum):
                   ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))]),
         {'pca__n_components': [0.95],
          'poly__degree': [1, 2, 3],
-         'regressor__max_iter': [1000, 2000, 3000],
+         'regressor__max_iter': [ 2000],
          'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
          'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
          })
@@ -193,12 +195,13 @@ PREPROCESS = False
 REDUCE_DIMENSIONS = False
 TRAINING = True
 HYPERPARAM_METHOD = HyperparamMethods.RandomizedSearchCV
-MODEL_METHOD = ModellingMethods.pca_keras_regressor
+MODEL_METHOD = ModellingMethods.pca_random_forest
 TARGET = 'price'  # 'condition'
 SPLIT_OPTION = SplitOption.WITH_INDEX
 
 PIPELINE = MODEL_METHOD.pipeline
 PARAMETERS = MODEL_METHOD.parameters
+METRICS = {}
 
 if not TRAINING:
     HYPERPARAM_METHOD = HyperparamMethods.parameter_search_off

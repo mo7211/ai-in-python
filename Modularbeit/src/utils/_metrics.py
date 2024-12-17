@@ -78,12 +78,22 @@ def write_run_metrics_to_csv(filepath, run_name, metrics):
 
     # Check if the file already exists
     if os.path.exists(filepath):
-        # If the file exists, append to it
+        # Read the existing dataframe
         existing_df = pd.read_csv(filepath)
+
+        # Ensure both DataFrames have the same columns
+        combined_columns = existing_df.columns.union(metrics_df.columns)
+        existing_df = existing_df.reindex(
+            columns=combined_columns, fill_value=pd.NA)
+        metrics_df = metrics_df.reindex(
+            columns=combined_columns, fill_value=pd.NA)
+
         if run_name in existing_df['run name'].values:
             # Overwrite the existing row with the new metrics
-            combined_df.loc[existing_df['run name']
-                            == run_name] = metrics_df.iloc[0]
+            row_index = existing_df.index[existing_df['run name'] == run_name].tolist()[
+                0]
+            combined_df = existing_df.copy()
+            combined_df.iloc[row_index] = metrics_df.iloc[0]
         else:
             # Append the new metrics as it doesn't already exist
             combined_df = pd.concat(

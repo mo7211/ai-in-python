@@ -18,7 +18,7 @@ from utils._metrics import *
 
 
 def measure_model(model: BaseEstimator, X_test: DataFrame, y_test: DataFrame, X: DataFrame, y: DataFrame) -> BaseEstimator:
-    metrics = {}
+    metrics = config.METRICS
 
     if model is not None and X is not None and y is not None and isinstance(model, Pipeline):
         logging.info('Generate metrics')

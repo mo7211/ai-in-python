@@ -51,8 +51,11 @@ class LogExecutionTime:
         result = self.function(*args, **kwargs)
         end_time = time.time()
         execution_time = end_time - start_time
-        logging.info(f"Function '{self.function.__name__}' executed in {
+        fn_name = self.function.__name__
+        logging.info(f"Function '{fn_name}' executed in {
                      execution_time:.4f} seconds.")
+        config.METRICS[f'{fn_name} run time'] = f'{execution_time:.4f}'
+
         return result
 
 
@@ -88,9 +91,9 @@ def move_old_files_to_archive(path, n_to_keep: int = 5):
                         os.path.join(archive_dir, file))
             # print(f"Moved {file} to archive.")
 
+
 def log_pipeline_steps(pipeline):
     steps = []
     for name, _ in pipeline.steps:
         steps.append(name)
     logging.info(f"Pipeline is: {steps}")
-    
