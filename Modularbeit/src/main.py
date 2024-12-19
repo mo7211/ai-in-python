@@ -3,17 +3,17 @@
 import logging
 import pandas as pd
 
-# visualize_cleaning, create_pairplot, create_heatmap, plot_tree, plot_pairplot
-from visualization import *
+from visualization import visualize_dataframe
 from utils import configurize_logger, define_target, read_data
 from data import clean_data, prep_data, reduce_dimensions
 from models import *
+
 import config
-from config import ModellingMethods
 
 
 def main():
-    configurize_logger(config.MODEL_METHOD.name)
+    config.MODEL_METHOD = config.ModellingMethods.keras_regressor
+    configurize_logger(config.MODEL_METHOD.name, config.LOGGING_PATH)
     show_plots = config.SHOW_PLOTS
 
     logging.info('Start script')
@@ -52,7 +52,8 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=config.TEST_SIZE, random_state=42)
 
-    model = train_model(X_train, y_train, config.PIPELINE, config.PARAMETERS)
+    model = train_model(
+        X_train, y_train, config.MODEL_METHOD.pipeline, config.MODEL_METHOD.parameters)
 
     measure_model(model, X_test, y_test, X, y)
 
@@ -60,4 +61,6 @@ def main():
 
 
 if __name__ == "__main__":
+    # for member in config.ModellingMethods:
+    #     config.MODEL_METHOD = member
     main()

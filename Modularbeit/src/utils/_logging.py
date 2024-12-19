@@ -18,7 +18,7 @@ def create_filename(path: str, name: str):
     return osp.join(path, name + "_" + get_time() + ".log")
 
 
-def configurize_logger(name: str):
+def configurize_logger(name: str, path:str ):
     '''
     Configurize the logger.
 
@@ -29,13 +29,13 @@ def configurize_logger(name: str):
     name (str) : The name of the logger.        
     '''
     logging.basicConfig(
-        filename=create_filename(config.LOGGING_PATH, name),
+        filename=create_filename(path, name),
         encoding='utf-8',
         level=logging.INFO,
         format='%(asctime)s %(levelname)-8s %(funcName)30s() %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S')
 
-    move_old_files_to_archive(config.LOGGING_PATH)
+    move_old_files_to_archive(path)
 
 
 def log_df_shape(df: DataFrame):
@@ -51,8 +51,11 @@ class LogExecutionTime:
         result = self.function(*args, **kwargs)
         end_time = time.time()
         execution_time = end_time - start_time
-        logging.info(f"Function '{self.function.__name__}' executed in {
+        fn_name = self.function.__name__
+        logging.info(f"Function '{fn_name}' executed in {
                      execution_time:.4f} seconds.")
+        config.METRICS[f'{fn_name} run time'] = f'{execution_time:.4f}'
+
         return result
 
 
@@ -88,9 +91,9 @@ def move_old_files_to_archive(path, n_to_keep: int = 5):
                         os.path.join(archive_dir, file))
             # print(f"Moved {file} to archive.")
 
+
 def log_pipeline_steps(pipeline):
     steps = []
     for name, _ in pipeline.steps:
         steps.append(name)
     logging.info(f"Pipeline is: {steps}")
-    

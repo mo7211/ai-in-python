@@ -8,7 +8,7 @@ from utils._logging import LogExecutionTime
 from utils import *
 
 
-@LogExecutionTime
+# @LogExecutionTime
 def clean_data(df: DataFrame, split_option: SplitOption, run: bool):
     if run:
         logging.info('Clean data')

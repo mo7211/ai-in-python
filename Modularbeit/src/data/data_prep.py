@@ -4,8 +4,8 @@ import config
 from utils import *
 
 
-@LogExecutionTime
-def prep_data(df: DataFrame, run:bool):
+# @LogExecutionTime
+def prep_data(df: DataFrame, run: bool):
     if run:
         logging.info(50*"=")
         logging.info("Start data preprocessing")
@@ -17,18 +17,17 @@ def prep_data(df: DataFrame, run:bool):
                           'last_reconstruction',
                           'floor',
                           'rooms'
-                         ]
-        
+                          ]
+
         if config.SPLIT_OPTION == config.SplitOption.WITH_INDEX:
-            index_columns = [ 'environment',
-                          'quality_of_living',
-                          'safety',
-                          'transport',
-                          'services',
-                          'relax',
-                          'index']
+            index_columns = ['environment',
+                             'quality_of_living',
+                             'safety',
+                             'transport',
+                             'services',
+                             'relax',
+                             'index']
             columns_minmax.extend(index_columns)
-            
 
         scaled_df = scale_minmax(df, columns_minmax)
 

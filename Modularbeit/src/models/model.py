@@ -12,11 +12,8 @@ from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.preprocessing import PolynomialFeatures
 
 
-from utils._visualization import plot_tree
 import config
 from utils._logging import LogExecutionTime, log_pipeline_steps
-from utils._models import log_metrics
-from utils._hyperparams import create_hyperparam_model
 
 
 @LogExecutionTime
