@@ -154,7 +154,7 @@ def plot_distribution(df: DataFrame, target_column: str, suffix: str = ''):
     plt.clf()
 
 
-def visualize_sdg_regressor(y: DataFrame, X: DataFrame, model: SGDRegressor, column_name: str):
+def visualize_sdg_regressor(y: DataFrame, X: DataFrame, model: SGDRegressor, column_name: str, show_plot=False):
     X_area = X[[column_name]].values  # Convert to numpy array
     y_price = y.values
 
@@ -186,21 +186,23 @@ def visualize_sdg_regressor(y: DataFrame, X: DataFrame, model: SGDRegressor, col
     plt.title(title)
     plt.legend()
     save_fig(plt, title)
-    plt.show()
+    if show_plot:
+        plt.show()
 
 
-def create_pairplot(df: DataFrame):
+def create_pairplot(df: DataFrame,show_plot=False):
 
     g = pd.plotting.scatter_matrix(df, figsize=(10, 10), marker='.', hist_kwds={
                                    'bins': 10}, s=60, alpha=0.8, range_padding=0.1)
     for ax in g[:, 0]:  # Iterate over the first column of subplot axes
         ax.yaxis.label.set_rotation(0)
         ax.yaxis.label.set_ha('right')
-    plt.show()
+    if show_plot:
+        plt.show()
     plt.clf()
 
 
-def create_heatmap(df: DataFrame):
+def create_heatmap(df: DataFrame, show_plot=False):
     # Create a heatmap
     plt.imshow(df, cmap='hot', interpolation='nearest')
 
@@ -208,7 +210,8 @@ def create_heatmap(df: DataFrame):
     plt.colorbar()
 
     # Show the plot
-    plt.show()
+    if show_plot:
+        plt.show()
     plt.clf()
 
 
@@ -368,7 +371,7 @@ def plot_learning_curve(model, X: DataFrame, y: DataFrame):
     # plt.axis([0, 80, 0, 2.5])
     save_fig(plt, title)
 
-    plt.show()
+    # plt.show()
     plt.clf()
 
     # # cellar

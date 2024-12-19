@@ -17,52 +17,45 @@ from keras.api.layers import Dense, Input, Dropout
 
 from utils._cleaning import SplitOption
 
-# def create_model(input_dim, optimizer='adam'):
-#     model = Sequential()
-#     model.add(Dense(64, input_dim=input_dim, activation='relu'))
-#     model.add(Dense(32, activation='relu'))
-#     model.add(Dense(1, activation='linear'))  # Adjust output layer for regression
-#     model.compile(optimizer=optimizer, loss='mean_squared_error')
-#     return model
-
-
-def create_model(optimizer="adam", dropout=0.1, init='uniform', nbr_features=164, dense_nparams=256, activation='sigmoid', **kwargs):
-    model = Sequential()
-    model.add(Input(shape=(nbr_features,)))
-    model.add(Dense(dense_nparams, activation=activation,
-              kernel_initializer=init,))
-    model.add(Dropout(dropout), )
-    model.add(Dense(1, activation=activation))
-    model.compile(loss='binary_crossentropy',
-                  optimizer=optimizer, metrics=["accuracy"])
-    return model
-
-
-def create_model_pca(optimizer="adam", dropout=0.1, init='uniform', nbr_features=27, dense_nparams=256, activation='sigmoid', **kwargs):
-    model = Sequential()
-    model.add(Input(shape=(nbr_features,)))
-    model.add(Dense(dense_nparams, activation=activation,
-              kernel_initializer=init,))
-    model.add(Dropout(dropout), )
-    model.add(Dense(1, activation=activation))
-    model.compile(loss='binary_crossentropy',
-                  optimizer=optimizer, metrics=["accuracy"])
-    return model
-
 
 class ModellingMethods(Enum):
-    training_off = (None, None)
+    # training_off = (None, None)
+    def create_model(model_n=1, dropout=0.1, optimizer="adam", init='uniform', nbr_features=164, dense_nparams=256, activation='sigmoid', **kwargs):
+        if model_n == 1:
+            model = Sequential()
+            model.add(Input(shape=(nbr_features,)))
+            model.add(Dense(dense_nparams, activation=activation))
+            model.add(Dropout(dropout))
+            model.add(Dense(1, activation='linear'))
+            model.compile(loss='binary_crossentropy',
+                          optimizer=optimizer, metrics=["accuracy"])
+            return model
+        
+        elif model_n == 2:
+            model = Sequential()
+            model.add(Input(shape=(nbr_features,)))
+            model.add(Dense(dense_nparams, activation=activation))
+            model.add(Dropout(dropout))
+            model.add(Dense(dense_nparams, activation=activation))
+            model.add(Dropout(dropout))
+            model.add(Dense(1, activation='linear'))
+            model.compile(loss='binary_crossentropy',
+                          optimizer=optimizer, metrics=["accuracy"])
+            return model
 
     pca_keras_regressor = (
         # Decision tree + dim reduction
-        Pipeline([('pca', PCA()),
-                  ('regressor', KerasRegressor(model=create_model_pca, verbose=0))]),
+        Pipeline([('pca', PCA(n_components=0.95)),
+                  ('regressor', KerasRegressor(model=create_model, verbose=0))]),
         {
-            'pca__n_components': [0.95],
-            # Example: You can add these to the grid search
-            'regressor__epochs': [50, 100],
-            'regressor__batch_size': [10, 20],
-            'regressor__optimizer': ['adam', 'rmsprop']
+            'regressor__epochs': [20, 50, 100, 150],
+            'regressor__batch_size': [10, 20, 30, 40, 50, 60],
+            'regressor__model__optimizer': ['adam', 'rmsprop'],
+            'regressor__model__dropout': [0.1, 0.2, 0.3, 0.4, 0.5],
+            'regressor__model__activation': ['sigmoid', 'relu'],
+            'regressor__model__dense_nparams': [32, 64, 128, 256],
+            'regressor__model__model_n': [1],
+            'regressor__model__nbr_features': [27]
         })
 
     keras_regressor = (
@@ -70,30 +63,35 @@ class ModellingMethods(Enum):
         Pipeline([
             ('regressor', KerasRegressor(model=create_model, verbose=0))]),
         {
-            'regressor__epochs': [50, 100],
-            'regressor__batch_size': [10, 20],
-            'regressor__optimizer': ['adam', 'rmsprop']
+            'regressor__epochs': [20, 50, 100, 150],
+            'regressor__batch_size': [10, 20, 30, 40],
+            'regressor__model__optimizer': ['adam', 'rmsprop'],
+            'regressor__model__dropout': [0.1, 0.2, 0.3, 0.4, 0.5],
+            'regressor__model__activation': ['sigmoid', 'relu'],
+            'regressor__model__dense_nparams': [64, 128, 256],
+            'regressor__model__model_n': [1],
+            'regressor__model__nbr_features': [164]
         })
 
-    pca_poly_regressor = (
-        Pipeline([('pca', PCA()),
-                  ('poly', PolynomialFeatures(include_bias=False)),
-                  ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))]),
-        {'pca__n_components': [0.95],
-         'poly__degree': [1, 2, 3],
-         'regressor__max_iter': [2000],
-         'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
-         'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
-         })
-    poly_regressor = (
-        Pipeline([('poly', PolynomialFeatures(include_bias=False)),
-                  ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))]),
-        {
-            'poly__degree': [1, 2, 3],
-            'regressor__max_iter': [2000],
-            'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
-            'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
-        })
+    # pca_poly_regressor = (
+    #     Pipeline([('pca', PCA()),
+    #               ('poly', PolynomialFeatures(include_bias=False)),
+    #               ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))]),
+    #     {'pca__n_components': [0.95],
+    #      'poly__degree': [1, 2, 3],
+    #      'regressor__max_iter': [2000],
+    #      'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
+    #      'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
+    #      })
+    # poly_regressor = (
+    #     Pipeline([('poly', PolynomialFeatures(include_bias=False)),
+    #               ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))]),
+    #     {
+    #         'poly__degree': [1, 2, 3],
+    #         'regressor__max_iter': [2000],
+    #         'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
+    #         'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
+    #     })
     pca_scaler_poly_regressor = (
         Pipeline([('pca', PCA()),
                   ('scaler', StandardScaler()),
@@ -101,7 +99,7 @@ class ModellingMethods(Enum):
                   ('regressor', SGDRegressor(tol=1e-5, n_iter_no_change=100, random_state=42))]),
         {'pca__n_components': [0.95],
          'poly__degree': [1, 2, 3],
-         'regressor__max_iter': [ 2000],
+         'regressor__max_iter': [2000],
          'regressor__penalty': [None, 'l2', 'l1', 'elasticnet'],
          'regressor__eta0': [0.5, 0.1, 0.05, 0.01],
          })
@@ -199,8 +197,6 @@ MODEL_METHOD = ModellingMethods.pca_random_forest
 TARGET = 'price'  # 'condition'
 SPLIT_OPTION = SplitOption.WITH_INDEX
 
-PIPELINE = MODEL_METHOD.pipeline
-PARAMETERS = MODEL_METHOD.parameters
 METRICS = {}
 
 if not TRAINING:

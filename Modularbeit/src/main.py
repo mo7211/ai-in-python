@@ -12,7 +12,8 @@ import config
 
 
 def main():
-    configurize_logger(config.MODEL_METHOD.name)
+    config.MODEL_METHOD = config.ModellingMethods.keras_regressor
+    configurize_logger(config.MODEL_METHOD.name, config.LOGGING_PATH)
     show_plots = config.SHOW_PLOTS
 
     logging.info('Start script')
@@ -51,9 +52,8 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=config.TEST_SIZE, random_state=42)
 
-    config.DATA_SHAPE = X_train.shape
-
-    model = train_model(X_train, y_train, config.PIPELINE, config.PARAMETERS)
+    model = train_model(
+        X_train, y_train, config.MODEL_METHOD.pipeline, config.MODEL_METHOD.parameters)
 
     measure_model(model, X_test, y_test, X, y)
 
@@ -61,4 +61,6 @@ def main():
 
 
 if __name__ == "__main__":
+    # for member in config.ModellingMethods:
+    #     config.MODEL_METHOD = member
     main()

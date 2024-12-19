@@ -18,7 +18,7 @@ def create_filename(path: str, name: str):
     return osp.join(path, name + "_" + get_time() + ".log")
 
 
-def configurize_logger(name: str):
+def configurize_logger(name: str, path:str ):
     '''
     Configurize the logger.
 
@@ -29,13 +29,13 @@ def configurize_logger(name: str):
     name (str) : The name of the logger.        
     '''
     logging.basicConfig(
-        filename=create_filename(config.LOGGING_PATH, name),
+        filename=create_filename(path, name),
         encoding='utf-8',
         level=logging.INFO,
         format='%(asctime)s %(levelname)-8s %(funcName)30s() %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S')
 
-    move_old_files_to_archive(config.LOGGING_PATH)
+    move_old_files_to_archive(path)
 
 
 def log_df_shape(df: DataFrame):
